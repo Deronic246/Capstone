@@ -198,6 +198,127 @@ background:#dcdcdc;
     transform: translateY(-10px); /* Raise the div by 10px on hover */
     box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2); /* Add a subtle shadow effect */
 }
+/* Absolute Center Spinner */
+.loading {
+  position: fixed;
+  z-index: 999;
+  height: 2em;
+  width: 2em;
+  overflow: show;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+/* Transparent Overlay */
+.loading:before {
+  content: '';
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+    background: radial-gradient(rgba(20, 20, 20,.8), rgba(0, 0, 0, .8));
+
+  background: -webkit-radial-gradient(rgba(20, 20, 20,.8), rgba(0, 0, 0,.8));
+}
+
+/* :not(:required) hides these rules from IE9 and below */
+.loading:not(:required) {
+  /* hide "loading..." text */
+  font: 0/0 a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+
+.loading:not(:required):after {
+  content: '';
+  display: block;
+  font-size: 10px;
+  width: 1em;
+  height: 1em;
+  margin-top: -0.5em;
+  -webkit-animation: spinner 150ms infinite linear;
+  -moz-animation: spinner 150ms infinite linear;
+  -ms-animation: spinner 150ms infinite linear;
+  -o-animation: spinner 150ms infinite linear;
+  animation: spinner 150ms infinite linear;
+  border-radius: 0.5em;
+  -webkit-box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1.1em 0 0, rgba(255,255,255, 0.75) 0 1.5em 0 0, rgba(255,255,255, 0.75) -1.1em 1.1em 0 0, rgba(255,255,255, 0.75) -1.5em 0 0 0, rgba(255,255,255, 0.75) -1.1em -1.1em 0 0, rgba(255,255,255, 0.75) 0 -1.5em 0 0, rgba(255,255,255, 0.75) 1.1em -1.1em 0 0;
+box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1.1em 0 0, rgba(255,255,255, 0.75) 0 1.5em 0 0, rgba(255,255,255, 0.75) -1.1em 1.1em 0 0, rgba(255,255,255, 0.75) -1.5em 0 0 0, rgba(255,255,255, 0.75) -1.1em -1.1em 0 0, rgba(255,255,255, 0.75) 0 -1.5em 0 0, rgba(255,255,255, 0.75) 1.1em -1.1em 0 0;
+}
+
+/* Animation */
+
+@-webkit-keyframes spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@-moz-keyframes spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@-o-keyframes spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes spinner {
+  0% {
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
 </style>
 <script
       src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -206,9 +327,10 @@ background:#dcdcdc;
     ></script>
 </head>
 <body>
-
+<div class="loading" style=display:none;>Loading&#8230;</div>
  <nav class="navbar navbar-expand-lg  navbar-dark bg-primary">
-    <a class="navbar-brand" href="\"><i class="fas fa-home pr-2"></i>Home</a>
+    <a class="navbar-brand" href="\"><i class="fas fa-thumbs-up pr-2"></i>Recommender</a>
+	 <a class="navbar-brand" href="\reviews"><i class="fas fa-scroll pr-2"></i>Spam Classifier</a>
   </nav>
   <section style="background-color: #eee;">
   <div class="container py-5">
@@ -221,7 +343,9 @@ background:#dcdcdc;
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
         $(document).ready(function() {
+		
             $('#predictBtn').click(function() {
+			$('.loading').show();
                 // Data to be sent in the AJAX request
                 var data = {
                     review_text: $('#review_text').val()
@@ -235,6 +359,7 @@ console.log(data);
                     data: JSON.stringify(data),
                     success: function(response) {
 					  if (response === 1) {
+					  $('.loading').hide();
 						// Display spam message
 						Swal.fire({
 						  icon: 'error',
@@ -243,11 +368,21 @@ console.log(data);
 						  confirmButtonText: 'OK'
 						});
 					  } else if (response === 0) {
+					  $('.loading').hide();
 						// Display ham (non-spam) message
 						Swal.fire({
 						  icon: 'success',
 						  title: 'Review is Ham',
 						  text: 'This review is not spam.',
+						  confirmButtonText: 'OK'
+						});
+					  }
+					  else{
+					  $('.loading').hide();
+						Swal.fire({
+						  icon: 'error',
+						  title: 'Submission Error',
+						  text: 'An error occurred while trying to classify review',
 						  confirmButtonText: 'OK'
 						});
 					  }

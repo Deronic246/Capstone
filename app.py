@@ -5,10 +5,11 @@ from pyspark.ml import PipelineModel
 from pyspark.ml.clustering import KMeansModel
 from pyspark.ml.classification import LinearSVCModel
 import os
-
+import re
+from textblob import TextBlob
 from pyspark.sql.functions import *
 import logging
-
+from transformers.lemmatizer import Lemmatizer
 from pyspark.ml import Transformer
 from pyspark.ml.param.shared import HasInputCol, HasOutputCol,TypeConverters
 from pyspark.ml.util import DefaultParamsWritable, DefaultParamsReadable
@@ -18,57 +19,16 @@ from nltk.stem import WordNetLemmatizer
 from pyspark import keyword_only
 from pyspark.conf import SparkConf
 import nltk
-
+from bs4 import BeautifulSoup
 app = Flask(__name__)
 
-class Lemmatizer(Transformer, HasInputCol, HasOutputCol, DefaultParamsWritable, DefaultParamsReadable):
-    input_col = Param(Params._dummy(), "input_col", "input column name.", typeConverter=TypeConverters.toString)
-    output_col = Param(Params._dummy(), "output_col", "output column name.", typeConverter=TypeConverters.toString)
-    @keyword_only
-    def __init__(self, input_col: str = "input", output_col: str = "output"):
-        super(Lemmatizer, self).__init__()
-        self._setDefault(input_col=None, output_col=None)
-        kwargs = self._input_kwargs
-        self.set_params(**kwargs)
-    
-    @keyword_only
-    def set_params(self, input_col: str = "input", output_col: str = "output"):
-        kwargs = self._input_kwargs
-        self._set(**kwargs)
+nltk.download('wordnet')
+nltk.download("averaged_perceptron_tagger")
 
-    def get_input_col(self):
-        return self.getOrDefault(self.input_col)
-
-    def get_output_col(self):
-        return self.getOrDefault(self.output_col)
-
-    # Implement the transformation logic
-    def _transform(self, dataset):
-       
-        input_column = self.get_input_col()
-        output_column =  self.get_output_col()
-        
-        # Initialize the WordNetLemmatizer
-        
-        lemmatizer = WordNetLemmatizer()
-        # Define the lemmatization function
-        def lemmatize_tokens(tokens):
-            pos_tags = nltk.pos_tag(tokens)
-            lemmas = []
-            for token in tokens:
-                lemma = lemmatizer.lemmatize(token)
-                lemmas.append(lemma)
-            return lemmas
-
-        # Register the UDF
-        lemmatize_udf = udf(lemmatize_tokens, ArrayType(StringType()))
-
-        # Apply transformation
-        return dataset.withColumn(output_column, lemmatize_udf(input_column))
 
 # Create a Spark session
 spark = SparkSession.builder \
-    .appName("newapp") \
+    .appName("newapp").master("local[*]")\
     .getOrCreate()
 
 # Get the directory containing the current script (app.py)
@@ -79,6 +39,10 @@ log_folder = os.path.join(current_directory, 'logging')
 os.makedirs(log_folder, exist_ok=True)  # Create the logging folder if it doesn't exist
 
 log_file = os.path.join(log_folder, 'app.log')
+
+with open(log_file, 'w'):
+    pass
+
 logging.basicConfig(filename=log_file, level=logging.ERROR)
 
 
@@ -127,7 +91,9 @@ def reviews():
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        review_dict = {"reviewText": review}
+        data = request.json  # JSON data sent in the request
+        
+        review_dict = {"reviewText": data['review_text']}
         #create dataframe using dictionary
         df = spark.createDataFrame([review_dict])
         #create user defined function to get sentiment score
@@ -139,9 +105,16 @@ def predict():
         #generate sentiment score column
         df = df.withColumn('sentiment_score',sentiment('reviewText').cast('double'))
         #generate absolute sentiment score column
-        df = df.withColumn('abs_sentiment_score', abs(spam_df['sentiment_score']))
+        df = df.withColumn('abs_sentiment_score', abs(df['sentiment_score']))
         #generate review length column
         df = df.withColumn("review_text_length", length("reviewText"))
+
+        # Register the clean_text function as a UDF (User-Defined Function)
+        clean_text_udf = udf(clean_text, StringType())
+
+        # Create a new column "review_body_clean" by applying the clean_text UDF to "review_body"
+        df = df.withColumn("reviewText_clean", clean_text_udf("reviewText"))
+        
         #clean text
         newdf=spamCleanPipeline.transform(df)
         #generate features
@@ -149,14 +122,28 @@ def predict():
         #predict if text is spam or ham based on features
         newdf=svmModel.transform(newdf)
         #get class of text
-        sclass=int(newdf.first()["class"])
+      
+        #app.logger.info("Columns of DataFrame: %s", ''.join(newdf.columns))
+        sclass=int(newdf.first()["prediction"])
         return jsonify(sclass) 
     except Exception as e:
         # Log the error to the file
-        app.logger.error('An error occurred: %s', e)
+        app.logger.error('\nAn error occurred: %s', e)
         return jsonify(3)
     
+# Define a function for data cleaning
+def clean_text(text):
+    soup = BeautifulSoup(text, 'html.parser')
+    text = soup.get_text()
+    # Remove Unicode characters
+    text = re.sub(r'[^\x00-\x7F]+', '', text)
     
+    # Normalize text
+    text = text.lower()
+    text = re.sub(r"[^a-zA-Z0-9\s]", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    
+    return text    
 
 if __name__ == '__main__':
     app.run(debug=True)
