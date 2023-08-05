@@ -5,7 +5,7 @@ from pyspark.ml import PipelineModel
 from pyspark.ml.clustering import KMeansModel
 from pyspark.ml.classification import LinearSVCModel
 import os
-from transformers.lemmatizer import Lemmatizer
+from lemmatizer import Lemmatizer
 
 from pyspark.sql.functions import *
 import logging
