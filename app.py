@@ -5,10 +5,19 @@ from pyspark.ml import PipelineModel
 from pyspark.ml.clustering import KMeansModel
 from pyspark.ml.classification import LinearSVCModel
 import os
-from lemmatizer import Lemmatizer
 
 from pyspark.sql.functions import *
 import logging
+
+from pyspark.ml import Transformer
+from pyspark.ml.param.shared import HasInputCol, HasOutputCol,TypeConverters
+from pyspark.ml.util import DefaultParamsWritable, DefaultParamsReadable
+from pyspark.ml.param import Param, Params
+from pyspark.sql.types import ArrayType, StringType
+from nltk.stem import WordNetLemmatizer
+from pyspark import keyword_only
+from pyspark.conf import SparkConf
+import nltk
 
 app = Flask(__name__)
 
@@ -54,6 +63,52 @@ product_data={"product_id":"1",'category':"Laptops","title":"HP Notebook","ratin
                    "imageurl":\
                    "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/5.webp",\
                   "similar_products":[],"reviews":[]}],"reviews":[{"customer_id":"34232323","verified_purchase":"yes","review_date":"1997-11-20","review_body":"fdfsdfsddfs fsdfdfs dfsdfsdf","review_type":"Ham","helpful_votes":45}]}
+
+class Lemmatizer(Transformer, HasInputCol, HasOutputCol, DefaultParamsWritable, DefaultParamsReadable):
+    input_col = Param(Params._dummy(), "input_col", "input column name.", typeConverter=TypeConverters.toString)
+    output_col = Param(Params._dummy(), "output_col", "output column name.", typeConverter=TypeConverters.toString)
+    @keyword_only
+    def __init__(self, input_col: str = "input", output_col: str = "output"):
+        super(Lemmatizer, self).__init__()
+        self._setDefault(input_col=None, output_col=None)
+        kwargs = self._input_kwargs
+        self.set_params(**kwargs)
+    
+    @keyword_only
+    def set_params(self, input_col: str = "input", output_col: str = "output"):
+        kwargs = self._input_kwargs
+        self._set(**kwargs)
+
+    def get_input_col(self):
+        return self.getOrDefault(self.input_col)
+
+    def get_output_col(self):
+        return self.getOrDefault(self.output_col)
+
+    # Implement the transformation logic
+    def _transform(self, dataset):
+       
+        input_column = self.get_input_col()
+        output_column =  self.get_output_col()
+        
+        # Initialize the WordNetLemmatizer
+        
+        lemmatizer = WordNetLemmatizer()
+        # Define the lemmatization function
+        def lemmatize_tokens(tokens):
+            pos_tags = nltk.pos_tag(tokens)
+            lemmas = []
+            for token in tokens:
+                lemma = lemmatizer.lemmatize(token)
+                lemmas.append(lemma)
+            return lemmas
+
+        # Register the UDF
+        lemmatize_udf = udf(lemmatize_tokens, ArrayType(StringType()))
+
+        # Apply transformation
+        return dataset.withColumn(output_column, lemmatize_udf(input_column))
+
 @app.route('/')
 @app.route('/home')
 def home():
