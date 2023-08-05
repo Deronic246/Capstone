@@ -1,5 +1,5 @@
 from pyspark.ml import Transformer
-from pyspark.ml.param.shared import HasInputCol, HasOutputCol
+from pyspark.ml.param.shared import HasInputCol, HasOutputCol,TypeConverters
 from pyspark.ml.util import DefaultParamsWritable, DefaultParamsReadable
 from pyspark.ml.param import Param, Params
 from pyspark.sql.functions import udf
