@@ -21,49 +21,6 @@ import nltk
 
 app = Flask(__name__)
 
-# Create a Spark session
-spark = SparkSession.builder \
-    .appName("newapp") \
-    .getOrCreate()
-
-# Get the directory containing the current script (app.py)
-current_directory = os.path.dirname(os.path.abspath(__file__))
-
-# Configure logging to a file
-log_folder = os.path.join(current_directory, 'logging')
-os.makedirs(log_folder, exist_ok=True)  # Create the logging folder if it doesn't exist
-
-log_file = os.path.join(log_folder, 'app.log')
-logging.basicConfig(filename=log_file, level=logging.ERROR)
-
-
-#initialize models
-kmeansModel=KMeansModel.load(os.path.join(current_directory, 'models', 'kmeans'))
-svmModel=LinearSVCModel.load(os.path.join(current_directory, 'models', 'svm'))
-#initialize pipelines
-spamCleanPipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'spam_preproc_pipeline'))
-spamprepPipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'data_prep_pipe'))
-
-product_data={"product_id":"1",'category':"Laptops","title":"HP Notebook","rating":2,\
-                   "imageurl":\
-                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/4.webp",\
-                  "similar_products":[{"product_id":"2",'category':"Laptops","title":"HP Notebook","rating":5,\
-                   "imageurl":\
-                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/4.webp",\
-                  "similar_products":[],"reviews":[]},{"product_id":"3",'category':"Laptops","title":"HP Notebook","rating":3,\
-                   "imageurl":\
-                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/7.webp",\
-                  "similar_products":[],"reviews":[]},{"product_id":"5",'category':"Laptops","title":"HP Notebook","rating":4,\
-                   "imageurl":\
-                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/5.webp",\
-                  "similar_products":[],"reviews":[]},{"product_id":"8",'category':"gdfgd","title":"HP Notebook","rating":5,\
-                   "imageurl":\
-                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/5.webp",\
-                  "similar_products":[],"reviews":[]},{"product_id":"11",'category':"Laptops","title":"HP Notebook","rating":1,\
-                   "imageurl":\
-                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/5.webp",\
-                  "similar_products":[],"reviews":[]}],"reviews":[{"customer_id":"34232323","verified_purchase":"yes","review_date":"1997-11-20","review_body":"fdfsdfsddfs fsdfdfs dfsdfsdf","review_type":"Ham","helpful_votes":45}]}
-
 class Lemmatizer(Transformer, HasInputCol, HasOutputCol, DefaultParamsWritable, DefaultParamsReadable):
     input_col = Param(Params._dummy(), "input_col", "input column name.", typeConverter=TypeConverters.toString)
     output_col = Param(Params._dummy(), "output_col", "output column name.", typeConverter=TypeConverters.toString)
@@ -108,6 +65,51 @@ class Lemmatizer(Transformer, HasInputCol, HasOutputCol, DefaultParamsWritable, 
 
         # Apply transformation
         return dataset.withColumn(output_column, lemmatize_udf(input_column))
+
+# Create a Spark session
+spark = SparkSession.builder \
+    .appName("newapp") \
+    .getOrCreate()
+
+# Get the directory containing the current script (app.py)
+current_directory = os.path.dirname(os.path.abspath(__file__))
+
+# Configure logging to a file
+log_folder = os.path.join(current_directory, 'logging')
+os.makedirs(log_folder, exist_ok=True)  # Create the logging folder if it doesn't exist
+
+log_file = os.path.join(log_folder, 'app.log')
+logging.basicConfig(filename=log_file, level=logging.ERROR)
+
+
+#initialize models
+kmeansModel=KMeansModel.load(os.path.join(current_directory, 'models', 'kmeans'))
+svmModel=LinearSVCModel.load(os.path.join(current_directory, 'models', 'svm'))
+#initialize pipelines
+spamCleanPipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'spam_preproc_pipeline'))
+spamprepPipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'data_prep_pipe'))
+
+product_data={"product_id":"1",'category':"Laptops","title":"HP Notebook","rating":2,\
+                   "imageurl":\
+                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/4.webp",\
+                  "similar_products":[{"product_id":"2",'category':"Laptops","title":"HP Notebook","rating":5,\
+                   "imageurl":\
+                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/4.webp",\
+                  "similar_products":[],"reviews":[]},{"product_id":"3",'category':"Laptops","title":"HP Notebook","rating":3,\
+                   "imageurl":\
+                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/7.webp",\
+                  "similar_products":[],"reviews":[]},{"product_id":"5",'category':"Laptops","title":"HP Notebook","rating":4,\
+                   "imageurl":\
+                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/5.webp",\
+                  "similar_products":[],"reviews":[]},{"product_id":"8",'category':"gdfgd","title":"HP Notebook","rating":5,\
+                   "imageurl":\
+                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/5.webp",\
+                  "similar_products":[],"reviews":[]},{"product_id":"11",'category':"Laptops","title":"HP Notebook","rating":1,\
+                   "imageurl":\
+                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/5.webp",\
+                  "similar_products":[],"reviews":[]}],"reviews":[{"customer_id":"34232323","verified_purchase":"yes","review_date":"1997-11-20","review_body":"fdfsdfsddfs fsdfdfs dfsdfsdf","review_type":"Ham","helpful_votes":45}]}
+
+
 
 @app.route('/')
 @app.route('/home')
