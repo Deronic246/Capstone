@@ -2,8 +2,8 @@
  {% block title %}Home{% endblock %}  
  
 {% block content %}
-   <div class="row">
-	
+<div class="row">
+
 	<div class="col-md-12 pb-4">
 	<div class="card">
 	<h1 class="p-4">Amazon Product Recommedation App <span class="subtitle" style="font-size:1rem">Powered by Customer Reviews</span></h1>
@@ -18,78 +18,11 @@
                 </div>
             </div>
 	</div>
-	<div class="col-md-12  mb-4 mb-lg-0">
-        <div class="card product">
-          <div class="d-flex justify-content-between p-3">
-            
-            
-          </div>
-          <img src="{{data.imageurl}}"
-            class="card-img-top" alt="{{data.category}}" />
-          <div class="card-body">
-            <div class="d-flex justify-content-between">
-              <p class="small"><a href="#!" class="text-muted">{{data.category}}</a></p>
-             
-            </div>
-
-            <div class="d-flex justify-content-between mb-3">
-              <h5 class="mb-0">{{data.title}}</h5>
-             
-            </div>
-
-            <div class="d-flex justify-content-between mb-2">
-              
-              <div class="ms-auto star_rating text-warning">
-               {% for _ in range(data.rating) %}
-                    <i class="fas fa-star"></i>
-                {% endfor %}
-              </div>
-			  <a href="{{ url_for('reviews', product_id=data.product_id) }}" class="btn btn-primary">View Product</a>
-            </div>
-			
-          </div>
-        </div>
-      </div>
-      
-	<div class="col-md-12 pt-4">
-	<div class="card">
-	<h2 class="p-4">Products related to this item</h2>
-	</div>
-	</div>
-       {% for product in data.similar_products %}
-            <div class="col-md-6 pt-4 col-lg-4 mb-4 mb-lg-0">
-        <div class="card product">
-          <div class="d-flex justify-content-between p-3">
-            
-            
-          </div>
-          <img src="{{product.imageurl}}"
-            class="card-img-top" alt="{{product.category}}" />
-          <div class="card-body">
-            <div class="d-flex justify-content-between">
-              <p class="small"><a href="#!" class="text-muted">{{product.category}}</a></p>
-             
-            </div>
-
-            <div class="d-flex justify-content-between mb-3">
-              <h5 class="mb-0">{{ product.title }}</h5>
-             
-            </div>
-
-            <div class="d-flex justify-content-between mb-2">
-              
-              <div class="ms-auto star_rating text-warning">
-               {% for _ in range(product.rating) %}
-                    <i class="fas fa-star"></i>
-                {% endfor %}
-              </div>
-			   <a href="{{ url_for('reviews', product_id=product.product_id) }}" class="btn btn-primary">View Product</a>
-            </div>
-          </div>
-        </div>
-      </div>
-     
-        {% endfor %}
+</div>
+   <div class="row" id="results">
+	
+	
+	
 	</div>
   
 {% endblock %}

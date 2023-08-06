@@ -417,7 +417,7 @@ box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1
 					},
         
                     error: function(error) {
-					console.log(error);
+					//console.log(error);
                         Swal.fire({
 						  icon: 'error',
 						  title: 'Submission Error',
@@ -446,9 +446,45 @@ box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1
 							data: JSON.stringify(data),
 							success: function(response) {
 							$('.loading').hide();
-							console.log(response);
+							//console.log(response);
+							var resultDiv = $('#results');
+							resultDiv.empty();
+							if (response.length>1){
+								var mainProduct=getMainProduct(response);
+								resultDiv.append(mainProduct);
+								resultDiv.append(getRelatedHeading());
+								var nList=getRelatedProducts(response);
+								//console.log(nList);
+								for(var i=0;i<nList.length;i++){
+									resultDiv.append(nList[i]);
+								
+								}
+							}
+							else if (response.length==1){
+								var mainProduct=getMainProduct(response);
+								resultDiv.append(mainProduct);
+								resultDiv.append(getRelatedHeading());
+								resultDiv.append($('<div class="col-md-12 pt-4">' +
+														'<div class="card">' +
+														'<h3 class="p-4">No related Items</h3>' +
+														'</div>' +
+														'</div>'));
+							}
+							  
+							 else{
+							 
+								Swal.fire({
+								  icon: 'error',
+								  title: 'Whoops!',
+								  text: 'An error occurred while retrieving related products. Try again later!',
+								  confirmButtonText: 'OK'
+								});
+							 
+							 }
+							  
 							  
 							  }
+							  
 						});
 				}
 				else{
@@ -465,6 +501,66 @@ box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1
 				
 			});
         });
+		function getRelatedHeading(){
+		 var relatedProductsHeading = $('<div class="col-md-12 pt-4">' +
+            '<div class="card">' +
+            '<h2 class="p-4">Products related to this item</h2>' +
+            '</div>' +
+            '</div>');
+			return relatedProductsHeading;
+		}
+		function getMainProduct(data){
+			var mainProductCard = $('<div class="col-md-12  mb-4 mb-lg-0"><div class="card product">' +
+            '<img src="../images/product.png" class="card-img-top" alt="' + data[0].product_category + '" />' +
+            '<div class="card-body">' +
+            '<div class="d-flex justify-content-between">' +
+            '<p class="small"><a href="#!" class="text-muted">' + data[0].product_category + '</a></p>' +
+            '</div>' +
+            '<div class="d-flex justify-content-between mb-3">' +
+            '<h5 class="mb-0">' + data[0].product_title + '</h5>' +
+            '</div>' +
+            '<div class="d-flex justify-content-between mb-2">' +
+            '<div class="ms-auto star_rating text-warning"></div></div></div></div></div>');
+			var star_div=mainProductCard.find(".star_rating");
+			// Generate star icons for the rating
+			for (var i = 0; i < data[0].star_rating; i++) {
+				star_div.append('<i class="fas fa-star"></i>');
+			}
+			console.log(star_div);
+			return mainProductCard;
+		}
+		function getRelatedProducts(data){
+		var newList=[];
+			var productsList=data.slice(1);
+			        // Loop through productsList and generate product cards
+			for (var i = 0; i < productsList.length; i++) {
+				var product = productsList[i];
+				var card = $('<div class="col-md-6 pt-4 col-lg-4 mb-4 mb-lg-0">' +
+					'<div class="card product">' +
+					'<img src="../images/product.png" class="card-img-top" alt="' + product.product_category + '" />' +
+					'<div class="card-body">' +
+					'<div class="d-flex justify-content-between">' +
+					'<p class="small"><a href="#!" class="text-muted">' + product.product_category + '</a></p>' +
+					'</div>' +
+					'<div class="d-flex justify-content-between mb-3">' +
+					'<h5 class="mb-0">' + product.product_title + '</h5>' +
+					'</div>' +
+					'<div class="d-flex justify-content-between mb-2">' +
+					'<div class="ms-auto star_rating text-warning"></div></div></div></div></div>');
+				
+				var star_div=card.find(".star_rating");
+				console.log(star_div);
+				// Generate star icons for the rating
+				for (var j = 0; j < product.star_rating; j++) {
+					star_div.append('<i class="fas fa-star"></i>');
+				}
+				
+
+				
+				newList.push(card);
+			}
+			return newList;
+		}
     </script>
 </body>
 
