@@ -243,7 +243,7 @@ def recommendProductsByReview():
         target_product_cluster = newdf.filter(col("product_id")==data["id"]).first()["prediction"]
 
         product_cluster_data=newdf\
-        .select("prediction","product_id","normalized_features","product_title","star_rating")\
+        .select("prediction","product_id","normalized_features","product_title","star_rating","product_category")\
         .filter(col("prediction")==target_product_cluster)
 
         product_data=newdf.select("prediction","product_id","normalized_features","product_title","star_rating")\
@@ -264,7 +264,7 @@ def recommendProductsByReview():
 
         top5prodIDs=cosine_similarity_df.limit(5).select(col("b.product_id")).withColumn("product_id",trim(col("product_id")))
 
-        distinctProducts=product_cluster_data.select("product_id","product_title","star_rating").distinct()\
+        distinctProducts=product_cluster_data.select("product_id","product_title","star_rating","product_category").distinct()\
         .withColumn("product_id",trim(col("product_id")))
 
         product_ids_list = top5prodIDs.rdd.flatMap(lambda x: x).collect()
