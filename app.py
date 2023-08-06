@@ -246,7 +246,7 @@ def recommendProductsByReview():
         .select("prediction","product_id","normalized_features","product_title","star_rating","product_category")\
         .filter(col("prediction")==target_product_cluster)
 
-        product_data=newdf.select("prediction","product_id","normalized_features","product_title","star_rating")\
+        product_data=newdf.select("prediction","product_id","normalized_features","product_title","star_rating","product_category")\
         .filter((col("prediction")==target_product_cluster) & (col("product_id")==data["id"])).limit(1)
 
         # Cross-join normalized features with itself to get all pairwise combinations
