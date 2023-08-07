@@ -55,6 +55,7 @@ try:
             id SERIAL PRIMARY KEY,
             customer_id VARCHAR(100),
             product_id VARCHAR(100),
+            product_category VARCHAR(100),
             product_title Text,
             review_id VARCHAR(100),
             review_body TEXT,
@@ -66,8 +67,8 @@ try:
 
     # Iterate through the DataFrame using iterrows and insert rows into the table
     for index, row in df.iterrows():
-        query = f"INSERT INTO reviews(customer_id, product_id,product_title,review_id,review_body,star_rating) VALUES ( %s, %s, %s, %s, %s, %s)"
-        values = (row["customer_id"], row["product_id"], row["product_title"], row["review_id"], row["review_body"], row["star_rating"])
+        query = f"INSERT INTO reviews(customer_id, product_id,product_category,product_title,review_id,review_body,star_rating) VALUES ( %s, %s, %s, %s, %s, %s, %s)"
+        values = (row["customer_id"], row["product_id"], row["product_category"],row["product_title"], row["review_id"], row["review_body"], row["star_rating"])
         cursor.execute(query, values)
         connection.commit()
 
