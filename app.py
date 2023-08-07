@@ -140,9 +140,9 @@ def reviews():
 def populateOptions():
     rows_as_list=[]
     try:
-        app.logger.info("test")
+      
         data = request.json
-        app.logger.info("result", json.dumps(data))
+
         # In a real app, you would fetch reviews from a database or API
         # For this example, we'll use some dummy data
         connection = psycopg2.connect(**db_config)
