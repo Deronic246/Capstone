@@ -373,6 +373,30 @@ box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1
 				cache: true
 			}
 		});
+		$('#searchTxt2').select2({
+			placeholder: 'Search for products',
+			minimumInputLength: 1,
+			ajax: {
+				url: '/populateOptionsForRatings',
+				dataType: 'json',
+				contentType: 'application/json', // Set content type to JSON
+				delay: 250,
+				 type: "POST",
+				  data: function (params) {
+                return JSON.stringify({ query: params.term }); // Send the typed text as JSON
+            },
+				processResults: function (data) {
+				var processedData = [];
+                for (var i = 0; i < data.length; i++) {
+                    processedData.push({ id: data[i][0], text: data[i][1] });
+                }
+					return {
+						results: processedData
+					};
+				},
+				cache: true
+			}
+		});
             $('#predictBtn').click(function() {
 			$('.loading').show();
                 // Data to be sent in the AJAX request

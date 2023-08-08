@@ -170,6 +170,35 @@ def populateOptions():
             return jsonify([])
     return jsonify(rows_as_list)
 
+@app.route('/populateOptionsForRatings', methods=['POST'])
+def populateOptionsForRatings():
+    rows_as_list=[]
+    try:
+      
+        data = request.json
+        
+        connection = psycopg2.connect(**db_config)
+
+        # Create a cursor to execute SQL queries
+        cur = connection.cursor()
+
+        # Formulate and execute the SELECT * query
+        cur.execute("SELECT distinct product_id, product_title FROM ratings where LOWER(product_title) LIKE '%{0}%'".format(data["query"]))
+
+        # Fetch all rows from the result set
+        rows = cur.fetchall()
+
+        # Convert rows to a list of lists
+        rows_as_list = [list(row) for row in rows]
+
+        # Close the cursor and connection
+        cur.close()
+        connection.close()
+    except Exception as e:
+            # Log the error to the file
+            app.logger.error('\nAn error occurred: %s', e)
+            return jsonify([])
+    return jsonify(rows_as_list)
 
 @app.route('/predict', methods=['POST'])
 def predict():
