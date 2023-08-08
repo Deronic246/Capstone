@@ -294,7 +294,7 @@ def recommendProductsByRating():
       
      
         
-        pdf = pd.read_sql("select distinct customer_id_index from ratings where customer_id='{0}'".format(data["id")), engine)
+        pdf = pd.read_sql("select distinct customer_id_index from ratings where customer_id='{0}'".format(data["id"]), engine)
         
         # Convert Pandas dataframe to spark DataFrame
         df = spark.createDataFrame(pdf)
