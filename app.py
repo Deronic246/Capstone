@@ -135,7 +135,7 @@ def reviews():
     return render_template('reviews.html')
 
 @app.route('/ratings')
-def reviews():
+def ratings():
     
     return render_template('ratings.html')
 
