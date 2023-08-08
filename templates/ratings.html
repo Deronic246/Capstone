@@ -1,0 +1,29 @@
+ {% extends 'layout.html' %}
+ {% block title %}Home{% endblock %}  
+ 
+{% block content %}
+<div class="row">
+
+	<div class="col-md-12 pb-4">
+	<div class="card">
+	<h1 class="p-4">Amazon Product Recommedation App <span class="subtitle" style="font-size:1rem">Powered by Customer Reviews</span></h1>
+	</div>
+	</div>
+	<div class="col-md-12 pb-4">
+	<div class="input-group">
+                
+				<select id="searchTxt" class="form-control"></select>
+                <div class="input-group-append">
+                    <button id="searchbtnRatings" class="btn btn-primary" type="button">Search</button>
+                </div>
+            </div>
+	</div>
+</div>
+   <div class="row" id="results">
+	
+	
+	
+	</div>
+  
+{% endblock %}
+  

@@ -4,6 +4,7 @@ from pyspark.sql import SparkSession
 from pyspark.ml import PipelineModel
 from pyspark.ml.clustering import KMeansModel
 from pyspark.ml.classification import LinearSVCModel
+from pyspark.ml.recommendation import ALSModel
 import os
 import re
 from textblob import TextBlob
@@ -14,7 +15,7 @@ from pyspark.ml import Transformer
 from pyspark.ml.param.shared import HasInputCol, HasOutputCol,TypeConverters
 from pyspark.ml.util import DefaultParamsWritable, DefaultParamsReadable
 from pyspark.ml.param import Param, Params
-from pyspark.sql.types import ArrayType, StringType
+from pyspark.sql.types import ArrayType, StringType,IntegerType
 from nltk.stem import WordNetLemmatizer
 from pyspark import keyword_only
 from pyspark.conf import SparkConf
@@ -131,10 +132,12 @@ def home():
 
 @app.route('/reviews')
 def reviews():
-    # In a real app, you would fetch reviews from a database or API
-    # For this example, we'll use some dummy data
-    
     return render_template('reviews.html')
+
+@app.route('/ratings')
+def reviews():
+    
+    return render_template('ratings.html')
 
 @app.route('/populateOptions', methods=['POST'])
 def populateOptions():
@@ -142,9 +145,7 @@ def populateOptions():
     try:
       
         data = request.json
-
-        # In a real app, you would fetch reviews from a database or API
-        # For this example, we'll use some dummy data
+        
         connection = psycopg2.connect(**db_config)
 
         # Create a cursor to execute SQL queries
@@ -207,6 +208,7 @@ def predict():
         # Log the error to the file
         app.logger.error('\nAn error occurred: %s', e)
         return jsonify(3)
+    
 @app.route('/recommendProductsByReview', methods=['POST'])
 def recommendProductsByReview():
     try:
@@ -283,8 +285,77 @@ def recommendProductsByReview():
         # Log the error to the file
         app.logger.error('\nAn error occurred: %s', e)
         return jsonify([])
-    
 
+    
+@app.route('/recommendProductsByRating', methods=['POST'])
+def recommendProductsByRating():
+    try:
+        data = request.json  # JSON data sent in the request       
+      
+     
+        
+        pdf = pd.read_sql("select distinct customer_id_index from ratings where customer_id='{0}'".format(data["id")), engine)
+        
+        # Convert Pandas dataframe to spark DataFrame
+        df = spark.createDataFrame(pdf)
+        model=ALSModel.load(os.path.join(current_directory, 'models', 'alsmodel'))
+
+        user_set = df.withColumn("customer_id_index", df["customer_id_index"].cast(IntegerType()))
+
+        recommendations=model.recommendForUserSubset(user_set,5)
+
+        recs=recommendations.withColumn("itemAndRating",explode(recommendations.recommendations))\
+        .select("customer_id_index","itemAndRating.*")
+
+        product_id_list=results.select("product_id").rdd.flatMap(lambda x: x).collect()
+
+        # Generate a comma-separated string of product IDs for the query
+        product_ids_str = ",".join(map(str, product_ids))
+
+        # SQL query to retrieve the first record for each product
+        query1 = f"SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id_index IN ({product_ids_str}) LIMIT 1;"
+
+        product_id=data["id"]
+        # SQL query to retrieve the first record that matches the product_id
+        query2 = f"SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id='{product_id}' LIMIT 1;"
+
+        # In a real app, you would fetch reviews from a database or API
+        # For this example, we'll use some dummy data
+        connection = psycopg2.connect(**db_config)
+
+        # Create a cursor to execute SQL queries
+        cur = connection.cursor()
+    
+        # Formulate and execute the SELECT * query
+        cur.execute(query1)
+
+        # Fetch all rows from the result set
+        results1 = cur.fetchall()
+
+        cur.execute(query2)
+        results2 = cur.fetchall()
+        
+        # Convert rows to a list of lists
+        rows_as_list1 = [list(row) for row in results1]
+        rows_as_list2 = [list(row) for row in results2]
+
+        finalList=rows_as_list2+rows_as_list1
+        
+
+        
+        return jsonify(finalList) 
+    except Exception as e:
+        # Log the error to the file
+        app.logger.error('\nAn error occurred: %s', e)
+        return jsonify([])
+    
+    finally:
+        # Close the cursor and the connection
+        if cur:
+            cur.close()
+        if connection:
+            connection.close()
+    
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

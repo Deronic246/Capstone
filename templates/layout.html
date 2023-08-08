@@ -429,7 +429,7 @@ box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1
 				
 				
             });
-			$('#searchbtn').click(function(){
+			$('#searchbtnReviews').click(function(){
 			$('.loading').show();
 				if($('#searchTxt').select2('data').length>0){			
 					
@@ -500,7 +500,79 @@ box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1
 				
 				
 			});
-        });
+			$('#searchbtnRatings').click(function(){
+			$('.loading').show();
+				if($('#searchTxt').select2('data').length>0){			
+					
+					var id=$('#searchTxt').select2('data')[0]["id"];
+					
+					
+					var data = {
+							id: $('#searchTxt').val()
+						};
+					$.ajax({
+							type: 'POST',
+							url:  "/recommendProductsByRating",
+							contentType: 'application/json',
+							data: JSON.stringify(data),
+							success: function(response) {
+							$('.loading').hide();
+							//console.log(response);
+							var resultDiv = $('#results');
+							resultDiv.empty();
+							if (response.length>1){
+								var mainProduct=getMainProduct(response);
+								resultDiv.append(mainProduct);
+								resultDiv.append(getRelatedHeading());
+								var nList=getRelatedProducts(response);
+								//console.log(nList);
+								for(var i=0;i<nList.length;i++){
+									resultDiv.append(nList[i]);
+								
+								}
+							}
+							else if (response.length==1){
+								var mainProduct=getMainProduct(response);
+								resultDiv.append(mainProduct);
+								resultDiv.append(getRelatedHeading());
+								resultDiv.append($('<div class="col-md-12 pt-4">' +
+														'<div class="card">' +
+														'<h3 class="p-4">No related Items</h3>' +
+														'</div>' +
+														'</div>'));
+							}
+							  
+							 else{
+							 
+								Swal.fire({
+								  icon: 'error',
+								  title: 'Whoops!',
+								  text: 'An error occurred while retrieving related products. Try again later!',
+								  confirmButtonText: 'OK'
+								});
+							 
+							 }
+							  
+							  
+							  }
+							  
+						});
+				}
+				else{
+				$('.loading').hide();
+					Swal.fire({
+						  icon: 'error',
+						  title: 'Whoops!',
+						  text: 'Please select product',
+						  confirmButtonText: 'OK'
+						});
+				
+				}
+				
+				
+			});
+        
+		});
 		function getRelatedHeading(){
 		 var relatedProductsHeading = $('<div class="col-md-12 pt-4">' +
             '<div class="card">' +
