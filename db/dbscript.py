@@ -88,8 +88,8 @@ try:
             product_category VARCHAR(100),
             product_title Text,
             star_rating INTEGER,
-            customer_id_index INT(12),
-            product_id_index INT(12)
+            customer_id_index INTEGER,
+            product_id_index INTEGER
         )
     """
     cursor.execute(create_table_query)
