@@ -527,13 +527,13 @@ box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1
 			});
 			$('#searchbtnRatings').click(function(){
 			$('.loading').show();
-				if($('#searchTxt').select2('data').length>0){			
+				if($('#searchTxt2').select2('data').length>0){			
 					
-					var id=$('#searchTxt').select2('data')[0]["id"];
+					var id=$('#searchTxt2').select2('data')[0]["id"];
 					
 					
 					var data = {
-							id: $('#searchTxt').val()
+							id: $('#searchTxt2').val()
 						};
 					$.ajax({
 							type: 'POST',
