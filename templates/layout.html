@@ -475,10 +475,12 @@ box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1
 							var resultDiv = $('#results');
 							resultDiv.empty();
 							if (response.length>1){
-								var mainProduct=getMainProduct(response);
+								var pList=moveProductToFront(response,id);
+								console.log(pList);
+								var mainProduct=getMainProduct(pList);
 								resultDiv.append(mainProduct);
 								resultDiv.append(getRelatedHeading());
-								var nList=getRelatedProducts(response);
+								var nList=getRelatedProducts(pList);
 								//console.log(nList);
 								for(var i=0;i<nList.length;i++){
 									resultDiv.append(nList[i]);
@@ -546,10 +548,12 @@ box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1
 							var resultDiv = $('#results');
 							resultDiv.empty();
 							if (response.length>1){
-								var mainProduct=getMainProduct(response);
+								var pList=moveProductToFront(response,id);
+								console.log(pList);
+								var mainProduct=getMainProduct(pList);
 								resultDiv.append(mainProduct);
 								resultDiv.append(getRelatedHeading());
-								var nList=getRelatedProducts(response);
+								var nList=getRelatedProducts(pList);
 								//console.log(nList);
 								for(var i=0;i<nList.length;i++){
 									resultDiv.append(nList[i]);
@@ -658,7 +662,21 @@ box-shadow: rgba(255,255,255, 0.75) 1.5em 0 0 0, rgba(255,255,255, 0.75) 1.1em 1
 			}
 			return newList;
 		}
-    </script>
+    
+		function moveProductToFront(jsonArray,product_id){		
+			
+			// Find the index of the JSON object with the target id
+			const targetIndex = jsonArray.findIndex(obj => obj.product_id === product_id);
+
+			// If the target object is found, move it to the front
+			if (targetIndex !== -1) {
+				const targetObject = jsonArray.splice(targetIndex, 1)[0];
+				jsonArray.unshift(targetObject);
+			}
+			return jsonArray;
+
+		}
+	</script>
 </body>
 
 </html>
