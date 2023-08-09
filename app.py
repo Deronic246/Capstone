@@ -304,18 +304,15 @@ def recommendProductsByRating():
         # Create a cursor to execute SQL queries
     cur = connection.cursor()
     try:
-
-        
-        
         data = request.json  # JSON data sent in the request       
-      
-        query = "select distinct customer_id_index from ratings where customer_id='{0}'".format(data["id"])
-        cur.execute(query)
-        result = cur.fetchall()
+        pdf = pd.read_sql("select distinct customer_id_index from ratings where customer_id='{0}'".format(data["id"], engine)
+        
+        # Convert Pandas dataframe to spark DataFrame
+        df = spark.createDataFrame(pdf)
 
-        df = pd.DataFrame(result, columns=["customer_id_index"])
         
-        
+       
+     
         model=ALSModel.load(os.path.join(current_directory, 'models', 'alsmodel'))
 
         user_set = df.withColumn("customer_id_index", df["customer_id_index"].cast(IntegerType()))
