@@ -307,12 +307,10 @@ def recommendProductsByRating():
         data = request.json  # JSON data sent in the request
         query="select distinct customer_id_index from ratings where product_id='{0}' LIMIT 1;".format(data["id"])
         
-        app.logger.error('\nQuery: {0}'.format(query))
+  
         
         pdf = pd.read_sql(query, engine)
-        app.logger.error('\Pandas count: {0}'.format(pdf.shape[0]))
-        app.logger.error('\Pandas data: {0}'.format(pdf.at[0, "customer_id_index"]))
-        app.logger.error('\nIs Dataset empty: {0}'.format(pdf.empty))
+
         
         # Convert Pandas dataframe to spark DataFrame
         df = spark.createDataFrame(pdf)
@@ -337,24 +335,18 @@ def recommendProductsByRating():
             list_of_dicts = [dict(zip(column_names, row)) for row in results]
             return jsonify(list_of_dicts)
         else:
-            app.logger.error('\n Count before: {0}'.format(recommendations.count()))
             recs=recommendations.withColumn("itemAndRating",explode(recommendations.recommendations))\
             .select("customer_id_index","itemAndRating.*")
 
-            app.logger.error('\n Count customer_id_index: {0}'.format(recs.select("customer_id_index").count()))
-           
-            app.logger.error('\n Count before: {0}'.format(recs.select("product_id_index").count()))
-            recs=recs.withColumn("product_id_index", recs["product_id_index"].cast(IntegerType()))
-            app.logger.error('\n Count before: {0}'.format(recs.select("product_id_index").count()))
-            app.logger.error('\n Before flatmap. Columns: {0}'.format(''.join(recs.columns)))
 
+            recs=recs.withColumn("product_id_index", recs["product_id_index"].cast(IntegerType()))
+  
              # Convert DataFrame to a JSON string
             json_strings = recs.toJSON().collect()
 
             # Combine JSON strings into a single string
             json_string = "[" + ",".join(json_strings) + "]"
 
-            app.logger.error('\n json: {0}'.format(json_string))
             
             # Using a loop
             formatted_string = ""
@@ -362,27 +354,23 @@ def recommendProductsByRating():
                 formatted_string += f"('{column_name}', '{data_type}'), "
 
             formatted_string = formatted_string.rstrip(', ')  # Remove the trailing comma and space
-            app.logger.error('\n dtypes: {0}'.format(formatted_string))
+            
+
             product_id_list=recs.select("product_id_index").rdd.flatMap(lambda x: x).collect()
 
            
 
             
-            app.logger.error('\n After flatmap. Columns: {0}'.format(''.join(recs.columns)))
-            # Generate a comma-separated string of product IDs for the query
-            #product_ids_str = ",".join(map(str, product_ids))
-            
-            #app.logger.error('\Products: {0}'.format(product_ids_str))
+       
             # SQL query to retrieve the first record for each product
             query1 = 'SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id_index IN {}'.format(tuple(product_id_list))
 
-            app.logger.error('\nQuery1: {0}'.format(query1))
+            
 
             product_id=data["id"]
             # SQL query to retrieve the first record that matches the product_id
             query2 = f"SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id='{product_id}' LIMIT 1;"
-            app.logger.error('\nQuery2: {0}'.format(query2))
-
+            
         
             # Formulate and execute the SELECT * query
             cur.execute(query1)
@@ -393,11 +381,7 @@ def recommendProductsByRating():
             cur.execute(query2)
             results2 = cur.fetchall()
             
-            # Convert rows to a list of lists
-            #rows_as_list1 = [list(row) for row in results1]
-            #rows_as_list2 = [list(row) for row in results2]
 
-            #finalList=rows_as_list2+rows_as_list1
             finalList=results2+results1
             
             list_of_dicts = [dict(zip(column_names, row)) for row in finalList]
