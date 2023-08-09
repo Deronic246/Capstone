@@ -372,8 +372,7 @@ def recommendProductsByRating():
             
             #app.logger.error('\Products: {0}'.format(product_ids_str))
             # SQL query to retrieve the first record for each product
-            query1 = 'SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id_index IN (' \
-           + (',?' * len(product_id_list))[1:] + ');'
+            query1 = 'SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id_index IN {}'.format(tuple(product_id_list))
 
             app.logger.error('\nQuery1: {0}'.format(query1))
 
@@ -384,7 +383,7 @@ def recommendProductsByRating():
 
         
             # Formulate and execute the SELECT * query
-            cur.execute(query1,product_id_list)
+            cur.execute(query1)
 
             # Fetch all rows from the result set
             results1 = cur.fetchall()
