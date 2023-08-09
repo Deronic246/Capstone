@@ -64,25 +64,6 @@ spamprepPipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines',
 reviews_preproc_pipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'reviews_preproc_pipeline'))
 clustering_pipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'clustering_pipeline1'))
 
-product_data={"product_id":"1",'category':"Laptops","title":"HP Notebook","rating":2,\
-                   "imageurl":\
-                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/4.webp",\
-                  "similar_products":[{"product_id":"2",'category':"Laptops","title":"HP Notebook","rating":5,\
-                   "imageurl":\
-                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/4.webp",\
-                  "similar_products":[],"reviews":[]},{"product_id":"3",'category':"Laptops","title":"HP Notebook","rating":3,\
-                   "imageurl":\
-                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/7.webp",\
-                  "similar_products":[],"reviews":[]},{"product_id":"5",'category':"Laptops","title":"HP Notebook","rating":4,\
-                   "imageurl":\
-                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/5.webp",\
-                  "similar_products":[],"reviews":[]},{"product_id":"8",'category':"gdfgd","title":"HP Notebook","rating":5,\
-                   "imageurl":\
-                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/5.webp",\
-                  "similar_products":[],"reviews":[]},{"product_id":"11",'category':"Laptops","title":"HP Notebook","rating":1,\
-                   "imageurl":\
-                   "https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/5.webp",\
-                  "similar_products":[],"reviews":[]}],"reviews":[{"customer_id":"34232323","verified_purchase":"yes","review_date":"1997-11-20","review_body":"fdfsdfsddfs fsdfdfs dfsdfsdf","review_type":"Ham","helpful_votes":45}]}
 
 db_config = {
     "host": "localhost",
@@ -319,6 +300,7 @@ def recommendProductsByReview():
 @app.route('/recommendProductsByRating', methods=['POST'])
 def recommendProductsByRating():
     cur=None
+    connection=None
     try:
         data = request.json  # JSON data sent in the request       
       
