@@ -333,8 +333,7 @@ def recommendProductsByRating():
 
             cur.execute(query)
             results = cur.fetchall()
-            rows_as_list = [list(row) for row in results]
-            return jsonify(rows_as_list)
+            return jsonify(results)
         else:
             app.logger.error('\n Count before: {0}'.format(recommendations.count()))
             recs=recommendations.withColumn("itemAndRating",explode(recommendations.recommendations))\
