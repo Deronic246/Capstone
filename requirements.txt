@@ -34,11 +34,13 @@ defusedxml==0.7.1
 ecdsa==0.18.0
 executing==1.2.0
 fastjsonschema==2.16.3
+findspark==2.0.1
 Flask==2.2.5
 flatdict==4.0.1
 fonttools==4.39.4
 fqdn==1.5.1
 frozenlist==1.3.3
+greenlet==2.0.2
 gunicorn==21.2.0
 idna==3.4
 ipykernel==6.22.0
@@ -89,6 +91,7 @@ preshed==3.0.8
 prometheus-client==0.16.0
 prompt-toolkit==3.0.38
 psutil==5.9.5
+psycopg2==2.9.7
 pure-eval==0.2.2
 py4j==0.10.9.7
 pyasn1==0.5.0
@@ -99,13 +102,13 @@ pydash==7.0.2
 Pygments==2.15.1
 pyparsing==3.0.9
 pyrsistent==0.19.3
-pyspark==3.4.0
+pyspark==3.4.1
 python-dateutil==2.8.2
 python-jose==3.3.0
 python-json-logger==2.0.7
 pytz==2023.3
-# pywin32==306
-# pywinpty==2.0.10
+pywin32==306
+pywinpty==2.0.10
 PyYAML==6.0
 pyzmq==25.0.2
 regex==2023.6.3
@@ -119,13 +122,14 @@ scipy==1.10.1
 seaborn==0.12.2
 Send2Trash==1.8.2
 six==1.16.0
-# sklearn==0.0.post5
+sklearn==0.0.post5
 smart-open==6.3.0
 sniffio==1.3.0
 soupsieve==2.4.1
 spacy==3.5.3
 spacy-legacy==3.0.12
 spacy-loggers==1.0.4
+SQLAlchemy==2.0.19
 srsly==2.4.6
 stack-data==0.6.2
 tenacity==8.2.2
