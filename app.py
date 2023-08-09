@@ -325,72 +325,83 @@ def recommendProductsByRating():
         user_set = df.withColumn("customer_id_index", df["customer_id_index"].cast(IntegerType()))
 
         recommendations=model.recommendForUserSubset(user_set,5)
-        app.logger.error('\n Count before: {0}'.format(recommendations.count()))
-        recs=recommendations.withColumn("itemAndRating",explode(recommendations.recommendations))\
-        .select("customer_id_index","itemAndRating.*")
+        if recommendations.count()>0:
+            app.logger.error('\nNo recommendations available')
+            product_id=data["id"]
+            # SQL query to retrieve the first record that matches the product_id
+            query = f"SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id='{product_id}' LIMIT 1;"
 
-        app.logger.error('\n Count customer_id_index: {0}'.format(recs.select("customer_id_index").count()))
-       
-        app.logger.error('\n Count before: {0}'.format(recs.select("product_id_index").count()))
-        recs=recs.withColumn("product_id_index", recs["product_id_index"].cast(IntegerType()))
-        app.logger.error('\n Count before: {0}'.format(recs.select("product_id_index").count()))
-        app.logger.error('\n Before flatmap. Columns: {0}'.format(''.join(recs.columns)))
+            cur.execute(query)
+            results = cur.fetchall()
+            rows_as_list = [list(row) for row in results]
+            return jsonify(rows_as_list)
+        else:
+            app.logger.error('\n Count before: {0}'.format(recommendations.count()))
+            recs=recommendations.withColumn("itemAndRating",explode(recommendations.recommendations))\
+            .select("customer_id_index","itemAndRating.*")
 
-         # Convert DataFrame to a JSON string
-        json_strings = recs.toJSON().collect()
+            app.logger.error('\n Count customer_id_index: {0}'.format(recs.select("customer_id_index").count()))
+           
+            app.logger.error('\n Count before: {0}'.format(recs.select("product_id_index").count()))
+            recs=recs.withColumn("product_id_index", recs["product_id_index"].cast(IntegerType()))
+            app.logger.error('\n Count before: {0}'.format(recs.select("product_id_index").count()))
+            app.logger.error('\n Before flatmap. Columns: {0}'.format(''.join(recs.columns)))
 
-        # Combine JSON strings into a single string
-        json_string = "[" + ",".join(json_strings) + "]"
+             # Convert DataFrame to a JSON string
+            json_strings = recs.toJSON().collect()
 
-        app.logger.error('\n json: {0}'.format(json_string))
-        
-        # Using a loop
-        formatted_string = ""
-        for column_name, data_type in recs.dtypes:
-            formatted_string += f"('{column_name}', '{data_type}'), "
+            # Combine JSON strings into a single string
+            json_string = "[" + ",".join(json_strings) + "]"
 
-        formatted_string = formatted_string.rstrip(', ')  # Remove the trailing comma and space
-        app.logger.error('\n dtypes: {0}'.format(formatted_string))
-        product_id_list=recs.select("product_id_index").rdd.flatMap(lambda x: x).collect()
+            app.logger.error('\n json: {0}'.format(json_string))
+            
+            # Using a loop
+            formatted_string = ""
+            for column_name, data_type in recs.dtypes:
+                formatted_string += f"('{column_name}', '{data_type}'), "
 
-       
+            formatted_string = formatted_string.rstrip(', ')  # Remove the trailing comma and space
+            app.logger.error('\n dtypes: {0}'.format(formatted_string))
+            product_id_list=recs.select("product_id_index").rdd.flatMap(lambda x: x).collect()
 
-        
-        app.logger.error('\n After flatmap. Columns: {0}'.format(''.join(recs.columns)))
-        # Generate a comma-separated string of product IDs for the query
-        #product_ids_str = ",".join(map(str, product_ids))
-        
-        #app.logger.error('\Products: {0}'.format(product_ids_str))
-        # SQL query to retrieve the first record for each product
-        query1 = 'SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id_index IN (' \
-       + (',?' * len(product_id_list))[1:] + ');'
+           
 
-        app.logger.error('\nQuery1: {0}'.format(query1))
+            
+            app.logger.error('\n After flatmap. Columns: {0}'.format(''.join(recs.columns)))
+            # Generate a comma-separated string of product IDs for the query
+            #product_ids_str = ",".join(map(str, product_ids))
+            
+            #app.logger.error('\Products: {0}'.format(product_ids_str))
+            # SQL query to retrieve the first record for each product
+            query1 = 'SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id_index IN (' \
+           + (',?' * len(product_id_list))[1:] + ');'
 
-        product_id=data["id"]
-        # SQL query to retrieve the first record that matches the product_id
-        query2 = f"SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id='{product_id}' LIMIT 1;"
-        app.logger.error('\nQuery2: {0}'.format(query2))
+            app.logger.error('\nQuery1: {0}'.format(query1))
 
-    
-        # Formulate and execute the SELECT * query
-        cur.execute(query1,product_id_list)
-
-        # Fetch all rows from the result set
-        results1 = cur.fetchall()
-
-        cur.execute(query2)
-        results2 = cur.fetchall()
-        
-        # Convert rows to a list of lists
-        rows_as_list1 = [list(row) for row in results1]
-        rows_as_list2 = [list(row) for row in results2]
-
-        finalList=rows_as_list2+rows_as_list1
-        
+            product_id=data["id"]
+            # SQL query to retrieve the first record that matches the product_id
+            query2 = f"SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id='{product_id}' LIMIT 1;"
+            app.logger.error('\nQuery2: {0}'.format(query2))
 
         
-        return jsonify(finalList) 
+            # Formulate and execute the SELECT * query
+            cur.execute(query1,product_id_list)
+
+            # Fetch all rows from the result set
+            results1 = cur.fetchall()
+
+            cur.execute(query2)
+            results2 = cur.fetchall()
+            
+            # Convert rows to a list of lists
+            rows_as_list1 = [list(row) for row in results1]
+            rows_as_list2 = [list(row) for row in results2]
+
+            finalList=rows_as_list2+rows_as_list1
+            
+
+            
+            return jsonify(finalList) 
     except Exception as e:
         # Log the error to the file
         app.logger.error('\nAn error occurred: %s', e)
