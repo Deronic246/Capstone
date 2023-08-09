@@ -329,9 +329,9 @@ def recommendProductsByRating():
         .select("customer_id_index","itemAndRating.*")
 
        
-        
+        app.logger.error('\n Count before: {0}'.format(recs.select("product_id_index").count()))
         recs=recs.withColumn("product_id_index", recs["product_id_index"].cast(IntegerType()))
-
+        app.logger.error('\n Count before: {0}'.format(recs.select("product_id_index").count()))
         app.logger.error('\n Before flatmap. Columns: {0}'.format(''.join(recs.columns)))
 
          # Convert DataFrame to a JSON string
