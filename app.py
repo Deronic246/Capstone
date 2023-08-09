@@ -330,7 +330,7 @@ def recommendProductsByRating():
 
        
         
-        recs=recs.withColumn("product_id_index", df["product_id_index"].cast(IntegerType()))
+        recs=recs.withColumn("product_id_index", recs["product_id_index"].cast(IntegerType()))
 
         app.logger.error('\n Before flatmap. Columns: {0}'.format(''.join(recs.columns)))
         product_id_list=recs.select("product_id_index").rdd.flatMap(lambda x: x).collect()
