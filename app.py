@@ -299,14 +299,13 @@ def recommendProductsByReview():
     
 @app.route('/recommendProductsByRating', methods=['POST'])
 def recommendProductsByRating():
-    cur=None
-    connection=None
-    try:
-
-        connection = psycopg2.connect(**db_config)
+    connection = psycopg2.connect(**db_config)
 
         # Create a cursor to execute SQL queries
-        cur = connection.cursor()
+    cur = connection.cursor()
+    try:
+
+        
         
         data = request.json  # JSON data sent in the request       
       
