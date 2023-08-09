@@ -316,7 +316,7 @@ def recommendProductsByRating():
         # Convert Pandas dataframe to spark DataFrame
         df = spark.createDataFrame(pdf)
 
-        app.logger.error('\n Count customer_id_index: {0}'.format(recs.select("customer_id_index").count()))
+      
        
      
         model=ALSModel.load(os.path.join(current_directory, 'models', 'alsmodel'))
@@ -328,6 +328,7 @@ def recommendProductsByRating():
         recs=recommendations.withColumn("itemAndRating",explode(recommendations.recommendations))\
         .select("customer_id_index","itemAndRating.*")
 
+        app.logger.error('\n Count customer_id_index: {0}'.format(recs.select("customer_id_index").count()))
        
         app.logger.error('\n Count before: {0}'.format(recs.select("product_id_index").count()))
         recs=recs.withColumn("product_id_index", recs["product_id_index"].cast(IntegerType()))
