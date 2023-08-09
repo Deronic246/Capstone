@@ -307,16 +307,16 @@ def recommendProductsByRating():
         data = request.json  # JSON data sent in the request
         query="select distinct customer_id_index from ratings where product_id='{0}'".format(data["id"])
         
-        #app.logger.error('\nQuery: {0}'.format(query))
+        app.logger.error('\nQuery: {0}'.format(query))
         
         pdf = pd.read_sql(query, engine)
         
-        #app.logger.error('\nIs Dataset empty: {0}'.format(pdf.empty))
+        app.logger.error('\nIs Dataset empty: {0}'.format(pdf.empty))
         
         # Convert Pandas dataframe to spark DataFrame
         df = spark.createDataFrame(pdf)
 
-        
+        app.logger.error('\n Count customer_id_index: {0}'.format(recs.select("customer_id_index").count()))
        
      
         model=ALSModel.load(os.path.join(current_directory, 'models', 'alsmodel'))
@@ -324,7 +324,7 @@ def recommendProductsByRating():
         user_set = df.withColumn("customer_id_index", df["customer_id_index"].cast(IntegerType()))
 
         recommendations=model.recommendForUserSubset(user_set,5)
-
+        app.logger.error('\n Count before: {0}'.format(recommendations.count()))
         recs=recommendations.withColumn("itemAndRating",explode(recommendations.recommendations))\
         .select("customer_id_index","itemAndRating.*")
 
