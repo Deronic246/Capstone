@@ -318,6 +318,7 @@ def recommendProductsByReview():
     
 @app.route('/recommendProductsByRating', methods=['POST'])
 def recommendProductsByRating():
+    cur=None
     try:
         data = request.json  # JSON data sent in the request       
       
