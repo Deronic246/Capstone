@@ -342,7 +342,13 @@ def recommendProductsByRating():
 
         app.logger.error('\n json: {0}'.format(json_string))
         
-        
+        # Using a loop
+        formatted_string = ""
+        for column_name, data_type in recs.dtypes:
+            formatted_string += f"('{column_name}', '{data_type}'), "
+
+        formatted_string = formatted_string.rstrip(', ')  # Remove the trailing comma and space
+        app.logger.error('\n dtypes: {0}'.format(formatted_string))
         product_id_list=recs.select("product_id_index").rdd.flatMap(lambda x: x).collect()
 
        
