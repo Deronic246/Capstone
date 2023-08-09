@@ -305,12 +305,13 @@ def recommendProductsByRating():
     cur = connection.cursor()
     try:
         data = request.json  # JSON data sent in the request
-        query="select distinct customer_id_index from ratings where product_id='{0}'".format(data["id"])
+        query="select distinct customer_id_index from ratings where product_id='{0}' LIMIT 1;".format(data["id"])
         
         app.logger.error('\nQuery: {0}'.format(query))
         
         pdf = pd.read_sql(query, engine)
-        
+        app.logger.error('\Pandas count: {0}'.format(pdf.shape[0]))
+        app.logger.error('\Pandas data: {0}'.format(pdf.at[0, "customer_id_index"]))
         app.logger.error('\nIs Dataset empty: {0}'.format(pdf.empty))
         
         # Convert Pandas dataframe to spark DataFrame
@@ -362,7 +363,7 @@ def recommendProductsByRating():
         #app.logger.error('\Products: {0}'.format(product_ids_str))
         # SQL query to retrieve the first record for each product
         query1 = 'SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id_index IN (' \
-       + (',?' * len(product_id_list))[1:] + ')'
+       + (',?' * len(product_id_list))[1:] + ');'
 
         app.logger.error('\nQuery1: {0}'.format(query1))
 
