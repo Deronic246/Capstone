@@ -323,6 +323,7 @@ def recommendProductsByRating():
         model=ALSModel.load(os.path.join(current_directory, 'models', 'alsmodel'))
 
         user_set = df.withColumn("customer_id_index", df["customer_id_index"].cast(IntegerType()))
+        column_names = ["product_id", "product_title", "star_rating", "product_category"]
 
         recommendations=model.recommendForUserSubset(user_set,5)
         if recommendations.count()==0:
@@ -333,7 +334,8 @@ def recommendProductsByRating():
 
             cur.execute(query)
             results = cur.fetchall()
-            return jsonify(results)
+            list_of_dicts = [dict(zip(column_names, row)) for row in results]
+            return jsonify(list_of_dicts)
         else:
             app.logger.error('\n Count before: {0}'.format(recommendations.count()))
             recs=recommendations.withColumn("itemAndRating",explode(recommendations.recommendations))\
@@ -392,12 +394,14 @@ def recommendProductsByRating():
             results2 = cur.fetchall()
             
             # Convert rows to a list of lists
-            rows_as_list1 = [list(row) for row in results1]
-            rows_as_list2 = [list(row) for row in results2]
+            #rows_as_list1 = [list(row) for row in results1]
+            #rows_as_list2 = [list(row) for row in results2]
 
-            finalList=rows_as_list2+rows_as_list1
+            #finalList=rows_as_list2+rows_as_list1
+            finalList=results2+results2
             
-
+            list_of_dicts = [dict(zip(column_names, row)) for row in finalList]
+            return jsonify(list_of_dicts)
             
             return jsonify(finalList) 
     except Exception as e:
