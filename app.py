@@ -398,7 +398,7 @@ def recommendProductsByRating():
             #rows_as_list2 = [list(row) for row in results2]
 
             #finalList=rows_as_list2+rows_as_list1
-            finalList=results2+results2
+            finalList=results2+results1
             
             list_of_dicts = [dict(zip(column_names, row)) for row in finalList]
             return jsonify(list_of_dicts)
