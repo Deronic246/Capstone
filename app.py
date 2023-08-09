@@ -325,7 +325,7 @@ def recommendProductsByRating():
         user_set = df.withColumn("customer_id_index", df["customer_id_index"].cast(IntegerType()))
 
         recommendations=model.recommendForUserSubset(user_set,5)
-        if recommendations.count()>0:
+        if recommendations.count()==0:
             app.logger.error('\nNo recommendations available')
             product_id=data["id"]
             # SQL query to retrieve the first record that matches the product_id
