@@ -328,12 +328,14 @@ def recommendProductsByRating():
         recs=recommendations.withColumn("itemAndRating",explode(recommendations.recommendations))\
         .select("customer_id_index","itemAndRating.*")
 
-        app.logger.error('\n Before flatmap. Columns: {0}'.format(''.join(recs.columns)))
+       
         
         recs=recs.withColumn("product_id_index", df["product_id_index"].cast(IntegerType()))
+
+        app.logger.error('\n Before flatmap. Columns: {0}'.format(''.join(recs.columns)))
         product_id_list=recs.select("product_id_index").rdd.flatMap(lambda x: x).collect()
         
-        app.logger.error('\n After flatmap')
+        app.logger.error('\n After flatmap. Columns: {0}'.format(''.join(recs.columns)))
         # Generate a comma-separated string of product IDs for the query
         #product_ids_str = ",".join(map(str, product_ids))
         
