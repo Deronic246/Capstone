@@ -340,7 +340,7 @@ def recommendProductsByRating():
         # Combine JSON strings into a single string
         json_string = "[" + ",".join(json_strings) + "]"
 
-        app.logger.error('\n json: {0}'.format(''.join(recs.columns)))
+        app.logger.error('\n json: {0}'.format(json_string))
         
         
         product_id_list=recs.select("product_id_index").rdd.flatMap(lambda x: x).collect()
