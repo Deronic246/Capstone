@@ -328,7 +328,7 @@ def recommendProductsByRating():
         recs=recommendations.withColumn("itemAndRating",explode(recommendations.recommendations))\
         .select("customer_id_index","itemAndRating.*")
 
-        product_id_list=results.select("product_id").rdd.flatMap(lambda x: x).collect()
+        product_id_list=recs.select("product_id").rdd.flatMap(lambda x: x).collect()
 
         # Generate a comma-separated string of product IDs for the query
         product_ids_str = ",".join(map(str, product_ids))
