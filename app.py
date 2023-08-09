@@ -51,7 +51,7 @@ log_file = os.path.join(log_folder, 'app.log')
 with open(log_file, 'w'):
     pass
 
-logging.basicConfig(filename=log_file, level=logging.ERROR)
+logging.basicConfig(filename=log_file, level=logging.DEBUG)
 
 
 #initialize models
