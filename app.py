@@ -72,7 +72,7 @@ db_config = {
     "database":"productdb"
 }
 engine = create_engine(
-    "postgresql+psycopg2://{0}:{1}@{2}/{3}?client_encoding=utf8".format(db_config["user"],db_config["password"],db_config["host"],db_config["database"]))
+    "postgresql+psycopg2://{0}:{1}@{2}/{3}".format(db_config["user"],db_config["password"],db_config["host"],db_config["database"]))
 
 #create user defined function to get sentiment score
 sentiment = udf(lambda x: TextBlob(x).sentiment[0])
@@ -302,14 +302,21 @@ def recommendProductsByRating():
     cur=None
     connection=None
     try:
+
+        connection = psycopg2.connect(**db_config)
+
+        # Create a cursor to execute SQL queries
+        cur = connection.cursor()
+        
         data = request.json  # JSON data sent in the request       
       
-     
+        query = "select distinct customer_id_index from ratings where customer_id='{0}'".format(data["id"])
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        df = pd.DataFrame(result, columns=["customer_id_index"])
         
-        pdf = pd.read_sql("select distinct customer_id_index from ratings where customer_id='{0}'".format(data["id"]), engine)
         
-        # Convert Pandas dataframe to spark DataFrame
-        df = spark.createDataFrame(pdf)
         model=ALSModel.load(os.path.join(current_directory, 'models', 'alsmodel'))
 
         user_set = df.withColumn("customer_id_index", df["customer_id_index"].cast(IntegerType()))
@@ -331,12 +338,7 @@ def recommendProductsByRating():
         # SQL query to retrieve the first record that matches the product_id
         query2 = f"SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id='{product_id}' LIMIT 1;"
 
-        # In a real app, you would fetch reviews from a database or API
-        # For this example, we'll use some dummy data
-        connection = psycopg2.connect(**db_config)
 
-        # Create a cursor to execute SQL queries
-        cur = connection.cursor()
     
         # Formulate and execute the SELECT * query
         cur.execute(query1)
