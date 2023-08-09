@@ -3,6 +3,7 @@ import psycopg2
 from psycopg2 import sql
 import pandas as pd
 import os
+import logging
 from pyspark.sql import SparkSession,DataFrame
 from pyspark.sql.functions import *
 from pyspark.conf import SparkConf
@@ -28,6 +29,18 @@ df=pd.read_json(json_file_path)
 df2=spark.read.option("header", "true")\
 .json(os.path.join(parent_directory, 'dataset', 'cfSample.json')).toPandas()
 
+
+# Configure logging to a file
+log_folder = os.path.join(parent_directory, 'logging')
+os.makedirs(log_folder, exist_ok=True)  # Create the logging folder if it doesn't exist
+
+log_file = os.path.join(log_folder, 'dbscript.log')
+
+with open(log_file, 'w'):
+    pass
+
+ # Configure the logging system 
+logging.basicConfig(filename =log_file, level = logging.ERROR) 
 # Connect to the PostgreSQL server (without specifying dbname)
 connection=None
 try:
@@ -104,8 +117,8 @@ try:
 
 
 
-except psycopg2.Error as err:
-    print("Error:", err)
+except Exception as e:
+    logging.error("An exception occurred: %s", str(e))
 
 finally:
     if connection is not None:
