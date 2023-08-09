@@ -51,7 +51,7 @@ log_file = os.path.join(log_folder, 'app.log')
 with open(log_file, 'w'):
     pass
 
-logging.basicConfig(filename=log_file, level=logging.DEBUG)
+logging.basicConfig(filename=log_file, level=logging.ERROR)
 
 
 #initialize models
@@ -311,7 +311,7 @@ def recommendProductsByRating():
       
         query = "select distinct customer_id_index from ratings where customer_id='{0}'".format(data["id"])
         cursor.execute(query)
-        result = cursor.fetchall()
+        result = cur.fetchall()
 
         df = pd.DataFrame(result, columns=["customer_id_index"])
         
