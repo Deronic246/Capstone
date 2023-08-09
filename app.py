@@ -310,7 +310,7 @@ def recommendProductsByRating():
         data = request.json  # JSON data sent in the request       
       
         query = "select distinct customer_id_index from ratings where customer_id='{0}'".format(data["id"])
-        cursor.execute(query)
+        cur.execute(query)
         result = cur.fetchall()
 
         df = pd.DataFrame(result, columns=["customer_id_index"])
