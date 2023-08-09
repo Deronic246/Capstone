@@ -328,14 +328,19 @@ def recommendProductsByRating():
         recs=recommendations.withColumn("itemAndRating",explode(recommendations.recommendations))\
         .select("customer_id_index","itemAndRating.*")
 
+        app.logger.error('\n Before flatmap')
+        
+        recs=recs.withColumn("product_id_index", df["product_id_index"].cast(IntegerType()))
         product_id_list=recs.select("product_id_index").rdd.flatMap(lambda x: x).collect()
-
+        
+        app.logger.error('\n After flatmap')
         # Generate a comma-separated string of product IDs for the query
-        product_ids_str = ",".join(map(str, product_ids))
-
-        app.logger.error('\Products: {0}'.format(product_ids_str))
+        #product_ids_str = ",".join(map(str, product_ids))
+        
+        #app.logger.error('\Products: {0}'.format(product_ids_str))
         # SQL query to retrieve the first record for each product
-        query1 = f"SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id_index IN ({product_ids_str}) LIMIT 1;"
+        query1 = 'SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id_index IN (' \
+       + (',?' * len(product_id_list))[1:] + ')'
 
         app.logger.error('\nQuery1: {0}'.format(query1))
 
@@ -346,7 +351,7 @@ def recommendProductsByRating():
 
     
         # Formulate and execute the SELECT * query
-        cur.execute(query1)
+        cur.execute(query1,product_id_list)
 
         # Fetch all rows from the result set
         results1 = cur.fetchall()
