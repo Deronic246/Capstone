@@ -109,7 +109,7 @@ cosine_similarity_udf = udf(cosine_similarity)
 @app.route('/home')
 def home():
    
-    return render_template('home.html',data=product_data)
+    return render_template('home.html')
 
 @app.route('/reviews')
 def reviews():
