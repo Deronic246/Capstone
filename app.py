@@ -306,7 +306,7 @@ def recommendProductsByRating():
     try:
         data = request.json  # JSON data sent in the request       
         pdf = pd.read_sql("select distinct customer_id_index from ratings where customer_id='{0}'".format(data["id"]), engine)
-        
+        app.logger.error('\nIs Dataset empty: {0}'.format(pdf.isEmpty()))
         # Convert Pandas dataframe to spark DataFrame
         df = spark.createDataFrame(pdf)
 
