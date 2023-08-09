@@ -333,13 +333,16 @@ def recommendProductsByRating():
         # Generate a comma-separated string of product IDs for the query
         product_ids_str = ",".join(map(str, product_ids))
 
+        app.logger.error('\Products: {0}'.format(product_ids_str))
         # SQL query to retrieve the first record for each product
         query1 = f"SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id_index IN ({product_ids_str}) LIMIT 1;"
+
+        app.logger.error('\nQuery1: {0}'.format(query1))
 
         product_id=data["id"]
         # SQL query to retrieve the first record that matches the product_id
         query2 = f"SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id='{product_id}' LIMIT 1;"
-
+        app.logger.error('\nQuery2: {0}'.format(query2))
 
     
         # Formulate and execute the SELECT * query
