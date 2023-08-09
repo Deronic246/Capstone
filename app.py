@@ -305,10 +305,14 @@ def recommendProductsByRating():
     cur = connection.cursor()
     try:
         data = request.json  # JSON data sent in the request
-        query="select distinct customer_id_index from ratings where customer_id='{0}'".format(data["id"])
-        app.logger.error('\nQuery: {0}'.format(query))
+        query="select distinct customer_id_index from ratings where product_id='{0}'".format(data["id"])
+        
+        #app.logger.error('\nQuery: {0}'.format(query))
+        
         pdf = pd.read_sql(query, engine)
-        app.logger.error('\nIs Dataset empty: {0}'.format(pdf.empty))
+        
+        #app.logger.error('\nIs Dataset empty: {0}'.format(pdf.empty))
+        
         # Convert Pandas dataframe to spark DataFrame
         df = spark.createDataFrame(pdf)
 
