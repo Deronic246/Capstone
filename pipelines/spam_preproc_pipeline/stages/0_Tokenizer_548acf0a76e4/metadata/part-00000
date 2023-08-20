@@ -1,1 +1,0 @@
-{"class":"org.apache.spark.ml.feature.Tokenizer","timestamp":1690977870183,"sparkVersion":"3.3.0","uid":"Tokenizer_548acf0a76e4","paramMap":{"outputCol":"token","inputCol":"reviewText_clean"},"defaultParamMap":{"outputCol":"Tokenizer_548acf0a76e4__output"}}

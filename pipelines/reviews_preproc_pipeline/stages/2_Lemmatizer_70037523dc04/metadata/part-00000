@@ -1,1 +1,0 @@
-{"class":"__main__.Lemmatizer","timestamp":1690947792555,"sparkVersion":"3.3.0","uid":"Lemmatizer_70037523dc04","paramMap":{"input_col":"stop_removed","output_col":"lemmas"},"defaultParamMap":{"outputCol":"Lemmatizer_70037523dc04__output","input_col":null,"output_col":null}}

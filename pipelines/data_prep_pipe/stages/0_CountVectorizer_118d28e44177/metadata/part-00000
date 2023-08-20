@@ -1,1 +1,0 @@
-{"class":"org.apache.spark.ml.feature.CountVectorizerModel","timestamp":1690799904994,"sparkVersion":"3.3.0","uid":"CountVectorizer_118d28e44177","paramMap":{"inputCol":"lemmas","outputCol":"c_vec"},"defaultParamMap":{"maxDF":9.223372036854776E18,"vocabSize":262144,"minDF":1.0,"binary":false,"minTF":1.0,"outputCol":"CountVectorizer_118d28e44177__output"}}

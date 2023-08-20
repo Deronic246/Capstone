@@ -1,1 +1,1 @@
-{"class":"pyspark.ml.pipeline.PipelineModel","timestamp":1690977868322,"sparkVersion":"3.3.0","uid":"PipelineModel_2d42da9da1a1","paramMap":{"stageUids":["Tokenizer_548acf0a76e4","StopWordsRemover_5b540de1cc82","Lemmatizer_437471e92e6b"],"language":"Python"},"defaultParamMap":{}}
+{"class":"pyspark.ml.pipeline.PipelineModel","timestamp":1692536350497,"sparkVersion":"3.4.1","uid":"PipelineModel_ffcc9418cf74","paramMap":{"stageUids":["Tokenizer_702b0cd04edc","StopWordsRemover_7bb5eaceb30e","Lemmatizer_0cf540326802"],"language":"Python"},"defaultParamMap":{}}
