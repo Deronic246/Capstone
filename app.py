@@ -15,7 +15,7 @@ from pyspark.ml import Transformer
 from pyspark.ml.param.shared import HasInputCol, HasOutputCol,TypeConverters
 from pyspark.ml.util import DefaultParamsWritable, DefaultParamsReadable
 from pyspark.ml.param import Param, Params
-from pyspark.sql.types import ArrayType, StringType,IntegerType
+from pyspark.sql.types import ArrayType, StringType,IntegerType,StructField,StructType
 from nltk.stem import WordNetLemmatizer
 from pyspark import keyword_only
 from pyspark.conf import SparkConf
@@ -55,8 +55,8 @@ logging.basicConfig(filename=log_file, level=logging.ERROR)
 
 
 #initialize models
-kmeansModel=KMeansModel.load(os.path.join(current_directory, 'models', 'kmeans'))
-svmModel=LinearSVCModel.load(os.path.join(current_directory, 'models', 'svm'))
+kmeansModel=KMeansModel.load(os.path.join(current_directory, 'models', 'kmeansmodel'))
+svmModel=LinearSVCModel.load(os.path.join(current_directory, 'models', 'svmmodel'))
 #initialize pipelines
 spamCleanPipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'spam_preproc_pipeline'))
 spamprepPipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'data_prep_pipe'))
@@ -164,7 +164,7 @@ def populateOptionsForRatings():
         cur = connection.cursor()
 
         # Formulate and execute the SELECT * query
-        cur.execute("SELECT distinct product_id, product_title FROM ratings where LOWER(product_title) LIKE '%{0}%'".format(data["query"]))
+        cur.execute("SELECT distinct product_id, product_title FROM reviews where LOWER(product_title) LIKE '%{0}%'".format(data["query"]))
 
         # Fetch all rows from the result set
         rows = cur.fetchall()
@@ -225,11 +225,15 @@ def recommendProductsByReview():
         data = request.json  # JSON data sent in the request       
       
      
-        
+        schema = StructType([StructField("id", IntegerType(), True), StructField("customer_id", StringType(), True)\
+                             ,StructField("product_id", StringType(), True),StructField("product_category", StringType(), True)\
+                             ,StructField("product_title", StringType(), True),StructField("review_id", StringType(), True)\
+                              ,StructField("review_body", StringType(), True),StructField("star_rating", IntegerType(), True)
+                             ,StructField("customer_id_index", IntegerType(), True),StructField("product_id_index", IntegerType(), True)])
         pdf = pd.read_sql('select * from reviews', engine)
         
         # Convert Pandas dataframe to spark DataFrame
-        df = spark.createDataFrame(pdf)
+        df = spark.createDataFrame(pdf,schema)
 
         #generate sentiment score column
         df = df.withColumn('sentiment_score',sentiment('review_body').cast('double'))
@@ -244,9 +248,17 @@ def recommendProductsByReview():
 
         # Create a new column "review_body_clean" by applying the clean_text UDF to "review_body"
         df = df.withColumn("review_body_clean", clean_text_udf("review_body"))
-        
+
         #clean text
         newdf=reviews_preproc_pipeline.transform(df)
+        grouped_df = newdf.groupBy("product_id","product_title","product_category").agg(
+            avg("abs_sentiment_score").alias("avg_abs_sentiment"),\
+            avg("review_text_length").alias("avg_review_length"),\
+            round(avg("star_rating"),0).alias("avg_star_rating"),\
+            collect_list("lemmas").alias("combined_tokens")
+        )
+        newdf = grouped_df.withColumn("combined_tokens", flatten(col("combined_tokens")))
+        
         #generate features
         newdf=clustering_pipeline.transform(newdf)
 
@@ -255,10 +267,10 @@ def recommendProductsByReview():
         target_product_cluster = newdf.filter(col("product_id")==data["id"]).first()["prediction"]
 
         product_cluster_data=newdf\
-        .select("prediction","product_id","normalized_features","product_title","star_rating","product_category")\
+        .select("prediction","product_id","features","product_title","avg_star_rating","product_category")\
         .filter(col("prediction")==target_product_cluster)
 
-        product_data=newdf.select("prediction","product_id","normalized_features","product_title","star_rating","product_category")\
+        product_data=newdf.select("prediction","product_id","features","product_title","avg_star_rating","product_category")\
         .filter((col("prediction")==target_product_cluster) & (col("product_id")==data["id"])).limit(1)
 
         # Cross-join normalized features with itself to get all pairwise combinations
@@ -268,16 +280,16 @@ def recommendProductsByReview():
         cosine_similarity_df = cross_joined_data.select(
             "a.product_id",
             "b.product_id",
-            cosine_similarity_udf("a.normalized_features", "b.normalized_features").alias("cosine_similarity")
+            cosine_similarity_udf("a.features", "b.features").alias("cosine_similarity")
         )
         # Filter out self-pairs (where product_id1 = product_id2)
         cosine_similarity_df = cosine_similarity_df.filter(col("a.product_id") != col("b.product_id"))\
         .orderBy(col("cosine_similarity").desc())
 
-        top5prodIDs=cosine_similarity_df.limit(5).select(col("b.product_id")).withColumn("product_id",trim(col("product_id")))
+        top5prodIDs=cosine_similarity_df.limit(5).select(col("b.product_id")).withColumn("product_id",trim(col("product_id"))).withColumnRenamed("avg_star_rating", "star_rating")
 
-        distinctProducts=product_cluster_data.select("product_id","product_title","star_rating","product_category").distinct()\
-        .withColumn("product_id",trim(col("product_id")))
+        distinctProducts=product_cluster_data.select("product_id","product_title","avg_star_rating","product_category").distinct()\
+        .withColumn("product_id",trim(col("product_id"))).withColumnRenamed("avg_star_rating", "star_rating")
 
         product_ids_list = top5prodIDs.rdd.flatMap(lambda x: x).collect()
         product_ids_list.insert(0, data["id"])
@@ -305,7 +317,7 @@ def recommendProductsByRating():
     cur = connection.cursor()
     try:
         data = request.json  # JSON data sent in the request
-        query="select distinct customer_id_index from ratings where product_id='{0}' LIMIT 1;".format(data["id"])
+        query="select distinct customer_id_index from reviews where product_id='{0}' LIMIT 1;".format(data["id"])
         
   
         
@@ -328,7 +340,7 @@ def recommendProductsByRating():
             app.logger.error('\nNo recommendations available')
             product_id=data["id"]
             # SQL query to retrieve the first record that matches the product_id
-            query = f"SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id='{product_id}' LIMIT 1;"
+            query = f"SELECT product_id,product_title,star_rating,product_category FROM reviews WHERE product_id='{product_id}' LIMIT 1;"
 
             cur.execute(query)
             results = cur.fetchall()
@@ -363,13 +375,13 @@ def recommendProductsByRating():
             
        
             # SQL query to retrieve the first record for each product
-            query1 = 'SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id_index IN {}'.format(tuple(product_id_list))
+            query1 = 'SELECT product_id,product_title,star_rating,product_category FROM reviews  WHERE product_id_index IN {}'.format(tuple(product_id_list))
 
             
 
             product_id=data["id"]
             # SQL query to retrieve the first record that matches the product_id
-            query2 = f"SELECT product_id,product_title,star_rating,product_category FROM ratings WHERE product_id='{product_id}' LIMIT 1;"
+            query2 = f"SELECT product_id,product_title,star_rating,product_category FROM reviews WHERE product_id='{product_id}' LIMIT 1;"
             
         
             # Formulate and execute the SELECT * query
@@ -402,4 +414,4 @@ def recommendProductsByRating():
     
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=7000)

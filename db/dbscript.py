@@ -22,13 +22,13 @@ parent_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # JSON file containing review data
-json_file_path = os.path.join(parent_directory, 'dataset', 'reviews10k.json')
+#json_file_path = os.path.join(parent_directory, 'dataset', 'reviews10k.json')
 
 # Open the JSON file and load data
-df=pd.read_json(json_file_path)
-df2=spark.read.option("header", "true")\
-.json(os.path.join(parent_directory, 'dataset', 'reviews.json')).toPandas()
-
+#df=pd.read_json(json_file_path)
+df=spark.read.option("header", "true")\
+.json(os.path.join(parent_directory, 'dataset', 'reviews.json')).sample(0.04,67).toPandas()
+#logging.info("testing")
 
 # Configure logging to a file
 log_folder = os.path.join(parent_directory, 'logging')
@@ -100,9 +100,11 @@ try:
 
 except Exception as e:
     logging.error("An exception occurred: %s", str(e))
+    spark.stop()
 
 finally:
     if connection is not None:
         cursor.close()
         connection.close()
         print("PostgreSQL connection is closed.")
+        spark.stop()
