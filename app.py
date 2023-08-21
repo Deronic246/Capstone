@@ -38,7 +38,7 @@ spark = SparkSession.builder \
     .appName("newapp").master("local[*]")\
      .config("spark.driver.memory", "15g") \
     .getOrCreate()
-
+sc = spark._sc
 # Get the directory containing the current script (app.py)
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -56,14 +56,14 @@ logging.basicConfig(filename=log_file, level=logging.ERROR)
 print('current_directory is %s', current_directory)
 print('kmeans path is %s', os.path.join(current_directory, 'models', 'kmeansmodel'))
 #initialize models
-kmeansModel=KMeansModel.load(os.path.join(current_directory, 'models', 'kmeansmodel'))
-svmModel=LinearSVCModel.load(os.path.join(current_directory, 'models', 'svmmodel'))
+kmeansModel=KMeansModel.load(sc,os.path.join(current_directory, 'models', 'kmeansmodel'))
+svmModel=LinearSVCModel.load(sc,os.path.join(current_directory, 'models', 'svmmodel'))
 #initialize pipelines
-spamCleanPipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'spam_preproc_pipeline'))
-spamprepPipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'data_prep_pipe'))
+spamCleanPipeline=PipelineModel.load(sc,os.path.join(current_directory, 'pipelines', 'spam_preproc_pipeline'))
+spamprepPipeline=PipelineModel.load(sc,os.path.join(current_directory, 'pipelines', 'data_prep_pipe'))
 
-reviews_preproc_pipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'reviews_preproc_pipeline'))
-clustering_pipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'clustering_pipeline1'))
+reviews_preproc_pipeline=PipelineModel.load(sc,os.path.join(current_directory, 'pipelines', 'reviews_preproc_pipeline'))
+clustering_pipeline=PipelineModel.load(sc,os.path.join(current_directory, 'pipelines', 'clustering_pipeline1'))
 
 
 db_config = {
