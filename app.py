@@ -53,7 +53,7 @@ with open(log_file, 'w'):
 
 logging.basicConfig(filename=log_file, level=logging.ERROR)
 
-logging.info('current_directory is %s', current_directory)
+print('current_directory is %s', current_directory)
 #initialize models
 kmeansModel=KMeansModel.load(os.path.join(current_directory, 'models', 'kmeansmodel'))
 svmModel=LinearSVCModel.load(os.path.join(current_directory, 'models', 'svmmodel'))
