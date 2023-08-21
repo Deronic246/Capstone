@@ -54,6 +54,7 @@ with open(log_file, 'w'):
 logging.basicConfig(filename=log_file, level=logging.ERROR)
 
 print('current_directory is %s', current_directory)
+print('kmeans path is %s', os.path.join(current_directory, 'models', 'kmeansmodel'))
 #initialize models
 kmeansModel=KMeansModel.load(os.path.join(current_directory, 'models', 'kmeansmodel'))
 svmModel=LinearSVCModel.load(os.path.join(current_directory, 'models', 'svmmodel'))
