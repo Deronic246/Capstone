@@ -8,7 +8,7 @@ from nltk.stem import WordNetLemmatizer
 from pyspark import keyword_only
 from pyspark.conf import SparkConf
 import nltk
-
+import __main__
 class Lemmatizer(Transformer, HasInputCol, HasOutputCol, DefaultParamsWritable, DefaultParamsReadable):
     input_col = Param(Params._dummy(), "input_col", "input column name.", typeConverter=TypeConverters.toString)
     output_col = Param(Params._dummy(), "output_col", "output column name.", typeConverter=TypeConverters.toString)
