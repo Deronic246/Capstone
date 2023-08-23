@@ -99,6 +99,11 @@ try:
     .option("url", "jdbc:postgresql://localhost:5432/productdb") \
     .option("driver", "org.postgresql.Driver").option("dbtable", "reviews") \
     .option("user", "postgres").option("password", "password").save()
+    
+      df.select("customer_id","product_id","product_category","product_title","review_body","star_rating","customer_id_index","product_id_index").sample(0.02, 10).write.format("jdbc")\
+    .option("url", "jdbc:postgresql://localhost:5432/productdb") \
+    .option("driver", "org.postgresql.Driver").option("dbtable", "reviewsample") \
+    .option("user", "postgres").option("password", "password").save()
 
     
 

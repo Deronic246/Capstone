@@ -136,7 +136,7 @@ def populateOptions():
 
         # Formulate and execute the SELECT * query
         #query = f"SELECT distinct product_id, product_title FROM reviews  LOWER(product_title) LIKE %s"
-        cur.execute("SELECT distinct product_id, product_title FROM reviews where LOWER(product_title) LIKE '%{0}%'".format(data["query"]))
+        cur.execute("SELECT distinct product_id, product_title FROM reviewsample where LOWER(product_title) LIKE '%{0}%'".format(data["query"]))
 
         # Fetch all rows from the result set
         rows = cur.fetchall()
@@ -232,7 +232,7 @@ def recommendProductsByReview():
                              ,StructField("product_title", StringType(), True),StructField("product_category", StringType(), True)\
                               ,StructField("star_rating", FloatType(), True)
                              ,StructField("review_body", StringType(), True)])
-        pdf = pd.read_sql("select product_id, product_title, product_category ,star_rating,review_body from reviews", engine)
+        pdf = pd.read_sql("select product_id, product_title, product_category ,star_rating,review_body from reviewsample", engine)
         
         # Convert Pandas dataframe to spark DataFrame
         df = spark.createDataFrame(pdf,schema)
