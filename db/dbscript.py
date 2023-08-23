@@ -70,22 +70,22 @@ try:
     connection = psycopg2.connect(**db_config)
     cursor = connection.cursor()
     cursor.execute(sql.SQL("Drop Table if exists reviews"))
-    # Create the reviews table if it doesn't exist
-    create_table_query = """
-        CREATE TABLE IF NOT EXISTS reviews (
-            id SERIAL PRIMARY KEY,
-            customer_id VARCHAR(100),
-            product_id VARCHAR(100),
-            product_category VARCHAR(100),
-            product_title Text,
-            review_id VARCHAR(100),
-            review_body TEXT,
-            star_rating INTEGER,
-            customer_id_index INTEGER,
-            product_id_index INTEGER
-        )
-    """
-    cursor.execute(create_table_query)
+    # # Create the reviews table if it doesn't exist
+    # create_table_query = """
+        # CREATE TABLE IF NOT EXISTS reviews (
+            # id SERIAL PRIMARY KEY,
+            # customer_id VARCHAR(100),
+            # product_id VARCHAR(100),
+            # product_category VARCHAR(100),
+            # product_title Text,
+            # review_id VARCHAR(100),
+            # review_body TEXT,
+            # star_rating INTEGER,
+            # customer_id_index INTEGER,
+            # product_id_index INTEGER
+        # )
+    # """
+    # cursor.execute(create_table_query)
     connection.commit()
 
     # Iterate through the DataFrame using iterrows and insert rows into the table
