@@ -253,7 +253,7 @@ def recommendProductsByReview():
 
         #clean text
         newdf=reviews_preproc_pipeline.transform(df)
-        grouped_df = newdf.groupBy("product_id","product_title","product_category").agg(
+        grouped_df = newdf.sample(0.04, 10).groupBy("product_id","product_title","product_category").agg(
             avg("abs_sentiment_score").alias("avg_abs_sentiment"),\
             avg("review_text_length").alias("avg_review_length"),\
             round(avg("star_rating"),0).alias("avg_star_rating"),\
