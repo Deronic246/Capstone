@@ -10,14 +10,11 @@ import re
 from textblob import TextBlob
 from pyspark.sql.functions import *
 import logging
-from importlib import reload # reload 
+
 
 from transformers.lemmatizer import Lemmatizer
-reload(Lemmatizer)
-from pyspark.ml import Transformer
-from pyspark.ml.param.shared import HasInputCol, HasOutputCol,TypeConverters
-from pyspark.ml.util import DefaultParamsWritable, DefaultParamsReadable
-from pyspark.ml.param import Param, Params
+
+
 from pyspark.sql.types import ArrayType, StringType,IntegerType,StructField,StructType
 #from nltk.stem import WordNetLemmatizer
 from pyspark import keyword_only
