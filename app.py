@@ -48,6 +48,17 @@ db_config = {
 engine = create_engine(
 "postgresql+psycopg2://{0}:{1}@{2}/{3}".format(db_config["user"],db_config["password"],db_config["host"],db_config["database"]))
 
+#initialize models
+svmModel=LinearSVCModel.load(os.path.join(current_directory, 'models', 'svmmodel'))
+kmeansModel=KMeansModel.load(os.path.join(current_directory, 'models', 'kmeansmodel'))
+
+#initialize pipelines
+spamCleanPipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'spam_preproc_pipeline'))
+spamprepPipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'data_prep_pipe'))
+
+reviews_preproc_pipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'reviews_preproc_pipeline'))
+clustering_pipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'clustering_pipeline1'))
+
 #create user defined function to get sentiment score
 sentiment = udf(lambda x: TextBlob(x).sentiment[0])
 
@@ -402,16 +413,7 @@ if __name__ == '__main__':
 
     print('current_directory is %s', current_directory)
     print('kmeans path is %s', os.path.join(current_directory, 'models', 'kmeansmodel'))
-    #initialize models
-    svmModel=LinearSVCModel.load(os.path.join(current_directory, 'models', 'svmmodel'))
-    kmeansModel=KMeansModel.load(os.path.join(current_directory, 'models', 'kmeansmodel'))
-
-    #initialize pipelines
-    spamCleanPipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'spam_preproc_pipeline'))
-    spamprepPipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'data_prep_pipe'))
-
-    reviews_preproc_pipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'reviews_preproc_pipeline'))
-    clustering_pipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'clustering_pipeline1'))
+   
 
 
     
