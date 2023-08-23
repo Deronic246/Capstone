@@ -94,7 +94,7 @@ try:
         # values = (row["customer_id"], row["product_id"], row["product_category"],row["product_title"],  row["review_body"], row["avg_star_rating"],row["customer_id_index"],row["product_id_index"])
         # cursor.execute(query, values)
         # connection.commit()
-        
+    df=df.withColumnRenamed("avg_star_rating", "star_rating")    
     df.select("customer_id","product_id","product_category","product_title","review_body","star_rating","customer_id_index","product_id_index").write.format("jdbc")\
     .option("url", "jdbc:postgresql://localhost:5432/productdb") \
     .option("driver", "org.postgresql.Driver").option("dbtable", "reviews") \
