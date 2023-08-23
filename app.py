@@ -166,7 +166,7 @@ def populateOptionsForRatings():
         cur = connection.cursor()
 
         # Formulate and execute the SELECT * query
-        cur.execute("SELECT distinct product_id, product_title FROM reviews where LOWER(product_title) LIKE '%{0}%'".format(data["query"]))
+        cur.execute("SELECT distinct customer_id, customer_id FROM reviews where customer_id LIKE '%{0}%'".format(data["query"]))
 
         # Fetch all rows from the result set
         rows = cur.fetchall()
@@ -319,7 +319,7 @@ def recommendProductsByRating():
     cur = connection.cursor()
     try:
         data = request.json  # JSON data sent in the request
-        query="select distinct customer_id_index from reviews where product_id='{0}' LIMIT 1;".format(data["id"])
+        query="select distinct customer_id_index from reviews where customer_id='{0}' LIMIT 1;".format(data["id"])
         
   
         
@@ -339,14 +339,8 @@ def recommendProductsByRating():
 
         recommendations=model.recommendForUserSubset(user_set,5)
         if recommendations.count()==0:
-            app.logger.error('\nNo recommendations available')
-            product_id=data["id"]
-            # SQL query to retrieve the first record that matches the product_id
-            query = f"SELECT product_id,product_title,star_rating,product_category FROM reviews WHERE product_id='{product_id}' LIMIT 1;"
-
-            cur.execute(query)
-            results = cur.fetchall()
-            list_of_dicts = [dict(zip(column_names, row)) for row in results]
+            app.logger.error('\nNo recommendations available')           
+            list_of_dicts = []
             return jsonify(list_of_dicts)
         else:
             recs=recommendations.withColumn("itemAndRating",explode(recommendations.recommendations))\
