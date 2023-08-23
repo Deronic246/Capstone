@@ -10,7 +10,7 @@ import re
 from textblob import TextBlob
 from pyspark.sql.functions import *
 import logging
-from transformers.lemmatizer import Lemmatizer
+#from transformers.lemmatizer import Lemmatizer
 from pyspark.ml import Transformer
 from pyspark.ml.param.shared import HasInputCol, HasOutputCol,TypeConverters
 from pyspark.ml.util import DefaultParamsWritable, DefaultParamsReadable
