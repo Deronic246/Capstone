@@ -26,6 +26,9 @@ import json
 from sqlalchemy import create_engine
 import pandas as pd
 
+from importlib import reload # reload 
+reload(transformers.lemmatizer)
+
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
