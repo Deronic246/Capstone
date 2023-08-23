@@ -27,7 +27,7 @@ parent_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Open the JSON file and load data
 #df=pd.read_json(json_file_path)
 df=spark.read.option("header", "true")\
-.json(os.path.join(parent_directory, 'dataset', 'reviews.json')).toPandas()
+.json(os.path.join(parent_directory, 'dataset', 'reviews.json'))
 #logging.info("testing")
 
 # Configure logging to a file
@@ -86,14 +86,19 @@ try:
         )
     """
     cursor.execute(create_table_query)
-
+    connection.commit()
 
     # Iterate through the DataFrame using iterrows and insert rows into the table
-    for index, row in df.iterrows():
-        query = f"INSERT INTO reviews(customer_id, product_id,product_category,product_title,review_body,star_rating,customer_id_index,product_id_index) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s)"
-        values = (row["customer_id"], row["product_id"], row["product_category"],row["product_title"],  row["review_body"], row["avg_star_rating"],row["customer_id_index"],row["product_id_index"])
-        cursor.execute(query, values)
-        connection.commit()
+    # for index, row in df.iterrows():
+        # query = f"INSERT INTO reviews(customer_id, product_id,product_category,product_title,review_body,star_rating,customer_id_index,product_id_index) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s)"
+        # values = (row["customer_id"], row["product_id"], row["product_category"],row["product_title"],  row["review_body"], row["avg_star_rating"],row["customer_id_index"],row["product_id_index"])
+        # cursor.execute(query, values)
+        # connection.commit()
+        
+    df.select("customer_id","product_id","product_category","product_title","review_body","star_rating","customer_id_index","product_id_index").write.format("jdbc")\
+    .option("url", "jdbc:postgresql://localhost:5432/productdb") \
+    .option("driver", "org.postgresql.Driver").option("dbtable", "reviews") \
+    .option("user", "postgres").option("password", "password").save()
 
     
 
