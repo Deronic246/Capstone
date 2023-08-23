@@ -26,6 +26,11 @@ import json
 from sqlalchemy import create_engine
 import pandas as pd
 
+app = Flask(__name__)
+app.config['DEBUG'] = True
+
+nltk.download('wordnet')
+nltk.download("averaged_perceptron_tagger")
 
 
 # Define a function for data cleaning
@@ -356,11 +361,7 @@ def recommendProductsByRating():
     
 
 if __name__ == '__main__':
-    app = Flask(__name__)
-    app.config['DEBUG'] = True
-
-    nltk.download('wordnet')
-    nltk.download("averaged_perceptron_tagger")
+    
 
 
     # Create a Spark session
