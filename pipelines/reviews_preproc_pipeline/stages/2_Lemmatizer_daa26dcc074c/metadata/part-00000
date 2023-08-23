@@ -1,0 +1,1 @@
+{"class":"transformers.lemmatizer.Lemmatizer","timestamp":1692828766083,"sparkVersion":"3.4.1","uid":"Lemmatizer_daa26dcc074c","paramMap":{"input_col":"stop_removed","output_col":"lemmas"},"defaultParamMap":{"outputCol":"Lemmatizer_daa26dcc074c__output","input_col":null,"output_col":null}}
