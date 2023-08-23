@@ -26,61 +26,7 @@ import json
 from sqlalchemy import create_engine
 import pandas as pd
 
-app = Flask(__name__)
-app.config['DEBUG'] = True
 
-nltk.download('wordnet')
-nltk.download("averaged_perceptron_tagger")
-
-
-# Create a Spark session
-spark = SparkSession.builder \
-    .appName("newapp").master("local[*]")\
-     .config("spark.driver.memory", "15g") \
-    .getOrCreate()
-sc = spark._sc
-# Get the directory containing the current script (app.py)
-current_directory = os.path.dirname(os.path.abspath(__file__))
-
-# Configure logging to a file
-log_folder = os.path.join(current_directory, 'logging')
-os.makedirs(log_folder, exist_ok=True)  # Create the logging folder if it doesn't exist
-
-log_file = os.path.join(log_folder, 'app.log')
-
-with open(log_file, 'w'):
-    pass
-
-logging.basicConfig(filename=log_file, level=logging.ERROR)
-
-print('current_directory is %s', current_directory)
-print('kmeans path is %s', os.path.join(current_directory, 'models', 'kmeansmodel'))
-#initialize models
-svmModel=LinearSVCModel.load(os.path.join(current_directory, 'models', 'svmmodel'))
-kmeansModel=KMeansModel.load(os.path.join(current_directory, 'models', 'kmeansmodel'))
-
-#initialize pipelines
-spamCleanPipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'spam_preproc_pipeline'))
-spamprepPipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'data_prep_pipe'))
-
-reviews_preproc_pipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'reviews_preproc_pipeline'))
-clustering_pipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'clustering_pipeline1'))
-
-
-db_config = {
-    "host": "localhost",
-    "user": "postgres",
-    "password": "password",
-    "database":"productdb"
-}
-engine = create_engine(
-    "postgresql+psycopg2://{0}:{1}@{2}/{3}".format(db_config["user"],db_config["password"],db_config["host"],db_config["database"]))
-
-#create user defined function to get sentiment score
-sentiment = udf(lambda x: TextBlob(x).sentiment[0])
-
-#register user defined function
-spark.udf.register("sentiment", sentiment)
 
 # Define a function for data cleaning
 def clean_text(text):
@@ -410,5 +356,59 @@ def recommendProductsByRating():
     
 
 if __name__ == '__main__':
-    lemmatizer= Lemmatizer(input_col="stop_removed", output_col="lemmas")
+    app = Flask(__name__)
+    app.config['DEBUG'] = True
+
+    nltk.download('wordnet')
+    nltk.download("averaged_perceptron_tagger")
+
+
+    # Create a Spark session
+    spark = SparkSession.builder \
+        .appName("newapp").master("local[*]")\
+         .config("spark.driver.memory", "15g") \
+        .getOrCreate()
+    sc = spark._sc
+    # Get the directory containing the current script (app.py)
+    current_directory = os.path.dirname(os.path.abspath(__file__))
+
+    # Configure logging to a file
+    log_folder = os.path.join(current_directory, 'logging')
+    os.makedirs(log_folder, exist_ok=True)  # Create the logging folder if it doesn't exist
+
+    log_file = os.path.join(log_folder, 'app.log')
+
+    with open(log_file, 'w'):
+        pass
+
+    logging.basicConfig(filename=log_file, level=logging.ERROR)
+
+    print('current_directory is %s', current_directory)
+    print('kmeans path is %s', os.path.join(current_directory, 'models', 'kmeansmodel'))
+    #initialize models
+    svmModel=LinearSVCModel.load(os.path.join(current_directory, 'models', 'svmmodel'))
+    kmeansModel=KMeansModel.load(os.path.join(current_directory, 'models', 'kmeansmodel'))
+
+    #initialize pipelines
+    spamCleanPipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'spam_preproc_pipeline'))
+    spamprepPipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'data_prep_pipe'))
+
+    reviews_preproc_pipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'reviews_preproc_pipeline'))
+    clustering_pipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'clustering_pipeline1'))
+
+
+    db_config = {
+        "host": "localhost",
+        "user": "postgres",
+        "password": "password",
+        "database":"productdb"
+    }
+    engine = create_engine(
+        "postgresql+psycopg2://{0}:{1}@{2}/{3}".format(db_config["user"],db_config["password"],db_config["host"],db_config["database"]))
+
+    #create user defined function to get sentiment score
+    sentiment = udf(lambda x: TextBlob(x).sentiment[0])
+
+    #register user defined function
+    spark.udf.register("sentiment", sentiment)
     app.run(host='0.0.0.0', port=8080)
