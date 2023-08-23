@@ -410,7 +410,7 @@ def recommendProductsByRating():
     
 
 if __name__ == '__main__': 
-
+    Lemmatizer.__module__ = "transformers.lemmatizer"
 
     
     app.run(host='0.0.0.0', port=8080)
