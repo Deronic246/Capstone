@@ -32,6 +32,20 @@ app.config['DEBUG'] = True
 nltk.download('wordnet')
 nltk.download("averaged_perceptron_tagger")
 
+db_config = {
+        "host": "localhost",
+        "user": "postgres",
+        "password": "password",
+        "database":"productdb"
+    }
+engine = create_engine(
+"postgresql+psycopg2://{0}:{1}@{2}/{3}".format(db_config["user"],db_config["password"],db_config["host"],db_config["database"]))
+
+#create user defined function to get sentiment score
+sentiment = udf(lambda x: TextBlob(x).sentiment[0])
+
+#register user defined function
+spark.udf.register("sentiment", sentiment)
 
 # Define a function for data cleaning
 def clean_text(text):
@@ -398,18 +412,5 @@ if __name__ == '__main__':
     clustering_pipeline=PipelineModel.load(os.path.join(current_directory, 'pipelines', 'clustering_pipeline1'))
 
 
-    db_config = {
-        "host": "localhost",
-        "user": "postgres",
-        "password": "password",
-        "database":"productdb"
-    }
-    engine = create_engine(
-        "postgresql+psycopg2://{0}:{1}@{2}/{3}".format(db_config["user"],db_config["password"],db_config["host"],db_config["database"]))
-
-    #create user defined function to get sentiment score
-    sentiment = udf(lambda x: TextBlob(x).sentiment[0])
-
-    #register user defined function
-    spark.udf.register("sentiment", sentiment)
+    
     app.run(host='0.0.0.0', port=8080)
