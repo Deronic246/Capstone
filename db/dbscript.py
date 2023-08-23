@@ -27,7 +27,7 @@ parent_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Open the JSON file and load data
 #df=pd.read_json(json_file_path)
 df=spark.read.option("header", "true")\
-.json(os.path.join(parent_directory, 'dataset', 'reviews_cleaned.json')).toPandas()
+.json(os.path.join(parent_directory, 'dataset', 'reviews.json')).toPandas()
 #logging.info("testing")
 
 # Configure logging to a file
