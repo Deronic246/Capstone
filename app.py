@@ -10,7 +10,7 @@ import re
 from textblob import TextBlob
 from pyspark.sql.functions import *
 import logging
-from transformers.lemmatizer import Lemmatizer
+from transformers.lemmatizer import *
 from pyspark.ml import Transformer
 from pyspark.ml.param.shared import HasInputCol, HasOutputCol,TypeConverters
 from pyspark.ml.util import DefaultParamsWritable, DefaultParamsReadable
@@ -410,7 +410,7 @@ def recommendProductsByRating():
     
 
 if __name__ == '__main__': 
-    lemmatizer= Lemmatizer(input_col="stop_removed", output_col="lemmas")
+    
 
     
     app.run(host='0.0.0.0', port=8080)
