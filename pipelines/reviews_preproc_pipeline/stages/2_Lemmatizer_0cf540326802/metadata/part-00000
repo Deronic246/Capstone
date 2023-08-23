@@ -1,1 +1,1 @@
-{"class":"__main__.Lemmatizer","timestamp":1692536325895,"sparkVersion":"3.4.1","uid":"Lemmatizer_0cf540326802","paramMap":{"input_col":"stop_removed","output_col":"lemmas"},"defaultParamMap":{"outputCol":"Lemmatizer_0cf540326802__output","input_col":null,"output_col":null}}
+{"class":"transformers.lemmatizer.Lemmatizer","timestamp":1692536325895,"sparkVersion":"3.4.1","uid":"Lemmatizer_0cf540326802","paramMap":{"input_col":"stop_removed","output_col":"lemmas"},"defaultParamMap":{"outputCol":"Lemmatizer_0cf540326802__output","input_col":null,"output_col":null}}
