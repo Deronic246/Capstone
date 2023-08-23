@@ -29,6 +29,13 @@ import pandas as pd
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
+# Create a Spark session
+spark = SparkSession.builder \
+    .appName("newapp").master("local[*]")\
+     .config("spark.driver.memory", "15g") \
+    .getOrCreate()
+sc = spark._sc
+
 nltk.download('wordnet')
 nltk.download("averaged_perceptron_tagger")
 
@@ -378,12 +385,7 @@ if __name__ == '__main__':
     
 
 
-    # Create a Spark session
-    spark = SparkSession.builder \
-        .appName("newapp").master("local[*]")\
-         .config("spark.driver.memory", "15g") \
-        .getOrCreate()
-    sc = spark._sc
+    
     # Get the directory containing the current script (app.py)
     current_directory = os.path.dirname(os.path.abspath(__file__))
 
