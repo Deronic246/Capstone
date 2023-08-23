@@ -410,4 +410,5 @@ def recommendProductsByRating():
     
 
 if __name__ == '__main__':
+    lemmatizer= Lemmatizer(input_col="stop_removed", output_col="lemmas")
     app.run(host='0.0.0.0', port=8080)
