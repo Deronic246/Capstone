@@ -371,7 +371,7 @@ def recommendProductsByRating():
             
        
             # SQL query to retrieve the first record for each product
-            query1 = 'SELECT product_id,product_title,star_rating,product_category FROM reviews  WHERE product_id_index IN {}'.format(tuple(product_id_list))
+            query1 = 'SELECT distinct product_id,product_title,star_rating,product_category FROM reviews  WHERE product_id_index IN {}'.format(tuple(product_id_list))
 
             
 
