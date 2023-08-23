@@ -70,6 +70,7 @@ try:
     connection = psycopg2.connect(**db_config)
     cursor = connection.cursor()
     cursor.execute(sql.SQL("Drop Table if exists reviews"))
+    cursor.execute(sql.SQL("Drop Table if exists reviewsample"))
     # # Create the reviews table if it doesn't exist
     # create_table_query = """
         # CREATE TABLE IF NOT EXISTS reviews (
