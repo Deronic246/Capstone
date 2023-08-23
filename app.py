@@ -16,7 +16,7 @@ from pyspark.ml.param.shared import HasInputCol, HasOutputCol,TypeConverters
 from pyspark.ml.util import DefaultParamsWritable, DefaultParamsReadable
 from pyspark.ml.param import Param, Params
 from pyspark.sql.types import ArrayType, StringType,IntegerType,StructField,StructType
-from nltk.stem import WordNetLemmatizer
+#from nltk.stem import WordNetLemmatizer
 from pyspark import keyword_only
 from pyspark.conf import SparkConf
 import nltk
