@@ -15,7 +15,7 @@ from pyspark.ml import Transformer
 from pyspark.ml.param.shared import HasInputCol, HasOutputCol,TypeConverters
 from pyspark.ml.util import DefaultParamsWritable, DefaultParamsReadable
 from pyspark.ml.param import Param, Params
-from pyspark.sql.types import ArrayType, StringType,IntegerType,StructField,StructType
+from pyspark.sql.types import ArrayType, StringType,IntegerType,StructField,StructType,FloatType
 from nltk.stem import WordNetLemmatizer
 from pyspark import keyword_only
 from pyspark.conf import SparkConf
@@ -202,7 +202,7 @@ def recommendProductsByReview():
         schema = StructType([ 
                              StructField("product_id", StringType(), True)\
                              ,StructField("product_title", StringType(), True),StructField("product_category", StringType(), True)\
-                              ,StructField("star_rating", IntegerType(), True)
+                              ,StructField("star_rating", FloatType(), True)
                              ,StructField("review_body", StringType(), True)])
         pdf = pd.read_sql("select product_id, product_title, product_category ,star_rating,review_body from reviews where product_id= '{0}'".format(data["id"]), engine)
         
