@@ -10,7 +10,10 @@ import re
 from textblob import TextBlob
 from pyspark.sql.functions import *
 import logging
+from importlib import reload # reload 
+
 from transformers.lemmatizer import Lemmatizer
+reload(Lemmatizer)
 from pyspark.ml import Transformer
 from pyspark.ml.param.shared import HasInputCol, HasOutputCol,TypeConverters
 from pyspark.ml.util import DefaultParamsWritable, DefaultParamsReadable
@@ -26,8 +29,7 @@ import json
 from sqlalchemy import create_engine
 import pandas as pd
 
-from importlib import reload # reload 
-reload(lemmatizer)
+
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
