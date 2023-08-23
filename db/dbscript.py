@@ -15,7 +15,7 @@ db_config = {
 }
 
 # Create a SparkSession
-spark = SparkSession.builder.appName("amazonapp").getOrCreate()
+spark = SparkSession.builder.config("spark.jars", "/usr/local/postgresql-42.2.5.jar").appName("amazonapp").getOrCreate()
 
 # Get the parent directory of the current script's directory
 parent_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
